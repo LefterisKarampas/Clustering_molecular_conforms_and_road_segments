@@ -1,4 +1,8 @@
 # Clustering_molecular_conform
+## Metric Distance
+1. c_rmsd
+2. Discrete Frechet
+3. Dynamic Time Warping
 ## Initialization
 1. K-means++  
 2. Random selection of k-objects
