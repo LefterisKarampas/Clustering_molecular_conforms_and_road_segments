@@ -1,14 +1,14 @@
 #include <iostream>
 #include <vector>
 #include "../include/List.h"
-#include "../include/Curve_Info.h"
+#include "../include/Object_Info.h"
 
 using namespace std;
-extern Curve_Info** curve_info;
-extern double ** Distance_Table;	
+extern Object_Info** object_info;
+extern double ** Distance_Table;
 
 
-bool Compare_GridCurves(Point *p1,Point *p2){
+bool Compare_points(Point *p1,Point *p2){
 	if(p1->size() != p2->size()){
 		return false;
 	}
@@ -37,9 +37,47 @@ List::~List(){						//Destroy the list
 	}
 }
 
+void List::Size(){
+	cout << this-> count << endl;
+}
+
+Point * List::List_Insert(int index,Point *point,int pos){		//Insert a new node to list
+	Node *k;
+	if(pos >= 0){
+		unsigned int i;
+		Node *temp = this->head;
+		while(temp != NULL){
+			Point * t = temp->Get_Point();
+			if((t->size() < 0) || (t->size() > 2)){
+				cerr << "Failed" << endl;
+				temp = temp->GetNext();
+				continue;
+			}
+			for(i=0;i<point->size();i++){
+				if((*t)[i] != (*point)[i]){
+					break;
+				}
+			}
+			if(i == point->size()){
+				temp->Update_Belongs(index,pos);
+				return t;
+			}
+			temp = temp->GetNext();
+		}
+	}
+	k = new Node(index,point,pos);		//Create a node
+	if(this->head != NULL){					//If list is not empty,set head as next to the new node
+		k->Set_next(this->head);
+	}
+	this->head = k;							//Set the new node as head
+	this->count++;
+	return NULL;
+}
+
 					
-int List::List_Insert(int index,Point *GridCurve){		//Insert a new node to list		
-	Node *k = new Node(index,GridCurve);		//Create a node
+int List::List_Insert(int index,Point *point){		//Insert a new node to list	
+	Node *k;
+	k = new Node(index,point);				//Create a node
 	if(this->head != NULL){					//If list is not empty,set head as next to the new node
 		k->Set_next(this->head);
 	}
@@ -48,7 +86,10 @@ int List::List_Insert(int index,Point *GridCurve){		//Insert a new node to list
 	return 0;
 }
 
-void List::List_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+
+
+
+/*void List::List_Search(int center,Object & object,Point * point,std::vector<int> *Closest_Neighbors,
 	std::vector<double> *Dist,long double (*distance)( Object&, Object &)){
 	Node * temp;							
 	if(this->head != NULL){					//If list is empty,return NULL
@@ -58,19 +99,19 @@ void List::List_Search(int center,Object & curve,Point * Grid_Curve,std::vector<
 		return;
 	}
 	while(temp){							//For each list's node
-		if(!Compare_GridCurves(Grid_Curve,temp->Get_GridCurve())){
+		if(!Compare_points(point,temp->Get_Point())){
 			temp = temp->GetNext();
 			continue;
 		}
 		Closest_Neighbors->push_back(temp->GetIndex());
-		double dist = (*distance)(curve,temp->GetValue());
-		curve_info[temp->GetIndex()]->LSH_Increment(center,dist);
+		double dist = (*distance)(object,temp->GetValue());
+		object_info[temp->GetIndex()]->LSH_Increment(center,dist);
 		Dist->push_back(dist);
 		temp = temp->GetNext();
 	}
 }
 
-void List::List_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+void List::List_Search(int center,Object & object,Point * point,std::vector<int> *Closest_Neighbors,
 	long double (*distance)( Object&, Object &)){
 	Node * temp;							
 	if(this->head != NULL){					//If list is empty,return NULL
@@ -80,7 +121,7 @@ void List::List_Search(int center,Object & curve,Point * Grid_Curve,std::vector<
 		return;
 	}
 	while(temp){							//For each list's node
-		if(!Compare_GridCurves(Grid_Curve,temp->Get_GridCurve())){
+		if(!Compare_points(point,temp->Get_Point())){
 			temp = temp->GetNext();
 			continue;
 		}
@@ -97,18 +138,18 @@ void List::List_Search(int center,Object & curve,Point * Grid_Curve,std::vector<
 		}
 		double dist;
 		if(Distance_Table[index_b][index_l] == -1){
-			dist = (*distance)(curve,temp->GetValue());
+			dist = (*distance)(object,temp->GetValue());
 			Distance_Table[index_b][index_l] = dist;
 		}
 		else{
 			dist = Distance_Table[index_b][index_l];
 		}
 		Closest_Neighbors->push_back(neigh);
-		curve_info[neigh]->LSH_Increment(center,dist);
+		object_info[neigh]->LSH_Increment(center,dist);
 		temp = temp->GetNext();
 	}
 }
-
+*/
 
 
 /*						//Search for nearest Curves
@@ -124,15 +165,15 @@ List * List::List_Search(Curve * v,bool *flag){
 	result = new List();
 	while(temp){							//For each list's node
 		Curve *x = temp->GetValue();
-		if(x->Compare_GridCurve(v)){		//Check if the curves have the same grid_curves
+		if(x->Compare_point(v)){		//Check if the objects have the same grid_objects
 			if(*flag == false){
 				*flag = true;				//If find at least one we will return only
-			}								//curves with the same grid_curve
+			}								//objects with the same grid_object
 			result->List_Insert(x);			
 		}
 		temp = temp->GetNext();
 	}
-	if(*flag == false){						//If we don't find any same grid_curve 
+	if(*flag == false){						//If we don't find any same grid_object 
 		result->head = this->head;			//Return all the list
 	}
 	return result;							//Return the list
@@ -180,19 +221,19 @@ void List::Search_Clear(){		//not the info
 
 
 /*				//Find the LSH nearest neighbor
-Curve * List::find_min(Curve curve,long double *min_distance,
+Curve * List::find_min(Curve object,long double *min_distance,
 	long double (*distance)(const  std::vector< std::vector<double> > &,const std::vector< std::vector<double> > &)){
 	Node *temp;
 	temp = this->head;
 	Curve *x;
 	x = temp->GetValue();
-	(*min_distance) = (*distance)(x->GetCurve(),curve.GetCurve());		//Compute the distance for first curve
+	(*min_distance) = (*distance)(x->GetCurve(),object.GetCurve());		//Compute the distance for first object
 	long double temp_min;
 	Curve *temp_x;
 	temp = temp->GetNext();
-	while(temp){														//For each curve in list
+	while(temp){														//For each object in list
 		temp_x = temp->GetValue();
-		temp_min = (*distance)(temp_x->GetCurve(),curve.GetCurve());	//compute the distance 
+		temp_min = (*distance)(temp_x->GetCurve(),object.GetCurve());	//compute the distance 
 		if(*min_distance > temp_min){									//compare the distances
 			x = temp_x;
 			*min_distance = temp_min;
@@ -205,23 +246,23 @@ Curve * List::find_min(Curve curve,long double *min_distance,
 
 
 				//Find the LSH nearest neighbor and the r_near neighbors
-Curve * List::find_min(Curve curve,long double *min_distance,
+Curve * List::find_min(Curve object,long double *min_distance,
 	long double (*distance)(const  std::vector< std::vector<double> > &,const std::vector< std::vector<double> > &),double R,std::vector<char *> *r_near){
 	Node *temp;
 	temp = this->head;
 	Curve *x;
 	x = temp->GetValue();
-	(*min_distance) = (*distance)(x->GetCurve(),curve.GetCurve());		//Compute the distance for first curve
+	(*min_distance) = (*distance)(x->GetCurve(),object.GetCurve());		//Compute the distance for first object
 	if(*min_distance < R){
 		r_near->push_back(x->GetId());
 	} 
 	long double temp_min;
 	Curve *temp_x;
 	temp = temp->GetNext();
-	while(temp != NULL){												//For each curve in list
+	while(temp != NULL){												//For each object in list
 		temp_x = temp->GetValue();
-		temp_min = (*distance)(temp_x->GetCurve(),curve.GetCurve());	//compute the distance 
-		if(temp_min < R){												//Check if curve is r_near neighbor
+		temp_min = (*distance)(temp_x->GetCurve(),object.GetCurve());	//compute the distance 
+		if(temp_min < R){												//Check if object is r_near neighbor
 			r_near->push_back(temp_x->GetId());
 		} 
 		if(*min_distance > temp_min){									//compare the distances
@@ -237,7 +278,7 @@ Curve * List::find_min(Curve curve,long double *min_distance,
 
 
 				//Find true nearest,LSH nearest neighbor and r_near neighbors
-Curve * List::find_nearest_min(Curve *curve,Curve *neigh,long double *neigh_dist,bool *cond,double R,std::vector<char *> *r_near,Curve *nearest_neigh,long double *nearest_dist,long double(*distance)(const std::vector< std::vector<double> >&,const std::vector< std::vector<double> >&)){
+Curve * List::find_nearest_min(Curve *object,Curve *neigh,long double *neigh_dist,bool *cond,double R,std::vector<char *> *r_near,Curve *nearest_neigh,long double *nearest_dist,long double(*distance)(const std::vector< std::vector<double> >&,const std::vector< std::vector<double> >&)){
 	Node *temp;
 	temp = this->head;
 	bool condition = false;
@@ -245,8 +286,8 @@ Curve * List::find_nearest_min(Curve *curve,Curve *neigh,long double *neigh_dist
 		Curve *x;
 		x = temp->GetValue();
 		long double temp_dist;
-		temp_dist = (*distance)(x->GetCurve(),curve->GetCurve());
-		if(x->Compare_GridCurve(curve)){
+		temp_dist = (*distance)(x->GetCurve(),object->GetCurve());
+		if(x->Compare_point(object)){
 			*cond = true;
 			if(neigh == NULL){
 				neigh = x;
@@ -277,14 +318,14 @@ Curve * List::find_nearest_min(Curve *curve,Curve *neigh,long double *neigh_dist
 
 
 					//Find true nearest
-Curve * List::find_nearest(Curve *curve,Curve *nearest_neigh,long double *nearest_dist,long double(*distance)(const std::vector< std::vector<double> >&,const std::vector< std::vector<double> >&)){
+Curve * List::find_nearest(Curve *object,Curve *nearest_neigh,long double *nearest_dist,long double(*distance)(const std::vector< std::vector<double> >&,const std::vector< std::vector<double> >&)){
 	Node *temp;
 	temp = this->head;
 	Curve *x;
 	while(temp){
 		x = temp->GetValue();
 		long double temp_dist;
-		temp_dist = (*distance)(x->GetCurve(),curve->GetCurve());
+		temp_dist = (*distance)(x->GetCurve(),object->GetCurve());
 		if(nearest_neigh == NULL){
 			nearest_neigh = x;
 			*nearest_dist = temp_dist;

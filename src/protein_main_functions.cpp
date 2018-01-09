@@ -9,9 +9,6 @@
 
 using namespace std;
 
-extern Object_Info** object_info;								//Structure for storing the curve's info
-extern double ** Distance_Table; 
-
 
 //Get the command line args
 int get_args(int argc,char ** argv, char ** input_file,char **metric,int *k){

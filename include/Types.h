@@ -6,8 +6,8 @@
 #include <vector>
 
 typedef std::vector<double> Point;
-typedef std::vector< Point > Conform;
-typedef Conform Object;
+typedef std::vector< Point > Object;
 typedef std::vector<Cluster *> Clusters; 
+
 
 #endif

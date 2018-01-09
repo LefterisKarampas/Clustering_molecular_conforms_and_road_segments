@@ -1,11 +1,12 @@
 #include "../include/HashTable.h"
 #include "../include/List.h"
-#include "../include/Curve.h"
+#include "../include/Types.h"
 #include <iostream>
 #include <limits.h>
 #include <stdlib.h>
 #include <vector>
 #include "../include/generator.h"
+
 
 
 //rand [M,N]
@@ -17,6 +18,8 @@
 
 using namespace std;
 
+unsigned long int hash(std::vector<double>);
+
 
 //----------------------------BUCKET FUNCTIONS---------------------------------------
 
@@ -27,89 +30,52 @@ Bucket::Bucket(){								//Initialize the Bucket
 
 
 
-	
 Bucket::~Bucket(){							//Delete the Bucket
 	if(this->list != NULL){
 		delete this->list;							//Delete the list if exists
 	}
 }
 
-
-
-
-int Bucket::Bucket_Insert(int index,Point *GridCurve){
+int Bucket::Bucket_Insert(int index,Point *point){
 	if(this->list == NULL){								//If list is empty
 		this->list = new List();						//Initialize it
 	}
-	return this->list->List_Insert(index,GridCurve); 	//Insert a new object
-	//this->list->print();
+	return this->list->List_Insert(index,point);  	//Insert a new object
 }
 
-void Bucket::Bucket_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+Point * Bucket::Bucket_Insert(int index,Point *point,int pos){
+	if(this->list == NULL){								//If list is empty
+		this->list = new List();						//Initialize it
+	}
+	return this->list->List_Insert(index,point,pos);  	//Insert a new object
+}
+
+void Bucket::Size(){
+	if(this-> list != NULL){
+		this->list->Size();
+	}
+	else{
+		cout << 0 << endl;
+	}
+}
+
+
+/*void Bucket::Bucket_Search(int center,Object & object,Point * point,std::vector<int> *Closest_Neighbors,
 	std::vector<double> *Dist,long double (*distance)( Object&, Object &)){
 	if(this->list == NULL){								//If list is empty
 		return;
 	}
-	this->list->List_Search(center,curve,Grid_Curve,Closest_Neighbors,Dist,distance); 
+	this->list->List_Search(center,object,point,Closest_Neighbors,Dist,distance); 
 }
-void Bucket::Bucket_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+
+
+void Bucket::Bucket_Search(int center,Object & object,Point * point,std::vector<int> *Closest_Neighbors,
 	long double (*distance)( Object&, Object &)){
 	if(this->list == NULL){								//If list is empty
 		return;
 	}
-	this->list->List_Search(center,curve,Grid_Curve,Closest_Neighbors,distance); 
-}
-
-
-
-/*
-List * Bucket::Bucket_Search(Curve * x,bool *flag){		//Search into Bucket
-	if(list != NULL){												//If list is not empty
-		return this->list->List_Search(x,flag);						//Search the list
-	}
-	else{
-		return NULL;												//Otherwise return NULL
-	}
-}
-*/
-
-
-							//Clear up the list
-/*void Bucket::Clear_up(){
-	if(this->list != NULL){							//If list not empty
-		this->list->Clear_up();						//Clear up the list
-	}
+	this->list->List_Search(center,object,point,Closest_Neighbors,distance); 
 }*/
-
-
-		//Find the nearest and the real neighbor and their distances in curve_bucket
-/*Curve * Bucket::find_nearest_min(Curve *curve,Curve *neigh,long double *neigh_dist,bool *cond,double R,std::vector<char *> *r_near,Curve * nearest_neigh,long double *nearest_dist,long double(*distance)(const Object&,const Object&)){
-	if(this->list != NULL){							//If list is not empty
-		nearest_neigh = NULL;						//Search for the neighbors there
-		nearest_neigh = this->list->find_nearest_min(curve,neigh,neigh_dist,cond,R,r_near,nearest_neigh,nearest_dist,distance);
-		return nearest_neigh;						//Return the real nearest
-	}
-	else{											//Othwerwise
-		neigh = NULL;								
-		*cond = false;								//Set flag false for existing same grid_curve neighbor
-		return NULL;								//Return null
-	}
-}*/
-	
-
-
-/*							//Find the real neighbor and its distance in not curve_bucket
-Curve * Bucket::find_nearest(Curve *curve,Curve *nearest_neigh,long double *nearest_dist,long double(*distance)(const Object&,const Object&)){
-	if(this->list != NULL){							//If list is not empty
-		Curve *nearest_neigh = NULL;					//Search for the neighbors there
-		nearest_neigh = this->list->find_nearest(curve,nearest_neigh,nearest_dist,distance);
-		return nearest_neigh;						//Return the real nearest
-	}
-	else{											//Othwerwise
-		return NULL;								//Return null
-	}
-}*/
-
 
 
 
@@ -117,7 +83,7 @@ Curve * Bucket::find_nearest(Curve *curve,Curve *nearest_neigh,long double *near
 //----------------------------HASHTABLE FUNCTIONS---------------------------------------
 
 
-		//Create the HashTable
+		//Create the HashTable for LSH
 HashTable::HashTable(const int k_vect,const int n,int(*hash_function)(const Point &,const std::vector<int> &,int,int,std::vector<double> **,double *)):k_vec_(k_vect),buckets(n),Hash_Function(hash_function){
 	this->T = new Bucket*[n];						//Create Array of n Buckets
 	for(int i=0;i<n;i++){
@@ -136,8 +102,16 @@ HashTable::HashTable(const int k_vect,const int n,int(*hash_function)(const Poin
 	}
 }
 
+		//Create the HashTable for LSH
+HashTable::HashTable(const int n):buckets(n),k_vec_(-1){
+	this->T = new Bucket*[n];						//Create Array of n Buckets
+	for(int i=0;i<n;i++){
+		this->T[i] = new Bucket();				//Initialize each bucket
+	}
+}
 
-		//Delete the HashTable
+
+//Delete the HashTable
 HashTable::~HashTable(){
 	for(int i=0;i<this->buckets;i++){
 		delete this->T[i];								//Delete each bucket
@@ -154,10 +128,10 @@ HashTable::~HashTable(){
 
 
 
-		//This function call the dynamic hash_function and
-int HashTable::Hash(Point *GridCurve){		//return the hash_value
+//This function call the dynamic hash_function and
+int HashTable::Hash(Point *point){		//return the hash_value
 	if(this->k_vec_ == 0){								//If we use classic_function
-		unsigned int size = GridCurve->size();
+		unsigned int size = point->size();
 		if(size > this->r.size()){						
 			unsigned int rsize = this->r.size();
 			for(unsigned int i=0;i<size-rsize;i++){
@@ -166,96 +140,55 @@ int HashTable::Hash(Point *GridCurve){		//return the hash_value
 		}
 	}
 	//Call the hash_function and return the number of bucket
-	return (*this->Hash_Function)(*GridCurve,this->r,this->buckets,this->k_vec_,this->v,this->t);
+	return (*this->Hash_Function)(*point,this->r,this->buckets,this->k_vec_,this->v,this->t);
 }
 
 
 
 
-int HashTable::Hash_Insert(int index,Point *GridCurve){		//Insert a new object to HT
-	int bucket = this->Hash(GridCurve);									//Get the number of bucket
-	if(bucket >= this->buckets){								//Check if all OK
+int HashTable::Hash_Insert(int index,Point *point){			//Insert a new object to HT
+
+	int bucket; 
+	bucket = this->Hash(point);							//Get the number of bucket
+	if(bucket >= this->buckets){							//Check if all OK
 		cerr << "Fail hash function: Index = " << bucket << endl;
 		return -1;
 	}
-	return this->T[bucket]->Bucket_Insert(index,GridCurve);					//Insert the object to the bucket
-
+	return this->T[bucket]->Bucket_Insert(index,point);		//Insert the object to the bucket
 }
 
-void HashTable::Hash_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+Point * HashTable::Hash_Insert(int index, Point *point,int pos){
+	int bucket;
+	bucket = hash(*point) % this->buckets;
+	//cout << "Max_bucket: "<< this->buckets <<", Bucket: " << bucket << endl;
+	return this->T[bucket]->Bucket_Insert(index,point,pos);
+}
+
+void HashTable::Size(){
+	for(int i=0;i<this->buckets;i++){
+		cout << "Bucket: " << i << " has size: " ;
+		this->T[i]->Size();
+	}
+}
+
+/*
+void HashTable::Hash_Search(int center,Object & object,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
 	std::vector<double> *Dist,long double (*distance)( Object&, Object &)){
 	int bucket = this->Hash(Grid_Curve);									//Get the number of bucket
 	if(bucket >= this->buckets){								//Check if all OK
 		cerr << "Fail hash function: Index = " << bucket << endl;
 		return ;
 	}
-	this->T[bucket]->Bucket_Search(center,curve,Grid_Curve,Closest_Neighbors,Dist,distance);	
+	this->T[bucket]->Bucket_Search(center,object,Grid_Curve,Closest_Neighbors,Dist,distance);	
 }
 
-void HashTable::Hash_Search(int center,Object & curve,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
+
+void HashTable::Hash_Search(int center,Object & object,Point * Grid_Curve,std::vector<int> *Closest_Neighbors,
 	long double (*distance)( Object&, Object &)){
 	int bucket = this->Hash(Grid_Curve);									//Get the number of bucket
 	if(bucket >= this->buckets){								//Check if all OK
 		cerr << "Fail hash function: Index = " << bucket << endl;
 		return ;
 	}
-	this->T[bucket]->Bucket_Search(center,curve,Grid_Curve,Closest_Neighbors,distance);	
-}
-
-
-
-
-/*				//Search for the nearest neighbors
-List * HashTable::Hash_Search(Curve * x,bool *flag){
-	int bucket = this->Hash(x);									//Find bucket where we have to search
-	if(bucket >= this->buckets){
-		cerr << "Fail hash function: Index = " << bucket << endl;
-		exit(1);
-	}
-	return this->T[bucket]->Bucket_Search(x,flag);				//Return the list of nearest neighbors
-
-}*/
-
-
-
-				//Clear up some structures
-/*void HashTable::Clear_up(){
-	for(int i=0;i<this->buckets;i++){
-		this->T[i]->Clear_up();
-	}
-}*/
-
-
-
-
-	//Search for the LSH nearest and true nearest neighbors
-/*Curve * HashTable::Check_all(Curve *curve,Curve *neigh,long double *neigh_dist,bool *cond,double R,std::vector<char *> *r_near,Curve *nearest_neigh,long double *nearest_dist,long double (*distance)(const Object &,const Object &)){
-	int bucket = this->Hash(curve);					//Get bucket number where LSH nearest could be found.
-	if(bucket >= this->buckets || bucket < 0){
-		cerr << "Fail hash function: Index = " << bucket << endl;
-		exit(1);
-	}
-	bool x = false;
-	for(int i=0;i<this->buckets;i++){			//Search all the buckets for true nearest neighbor
-		long double near_dist;
-		Curve * near_neigh = NULL;
-		if(i == bucket){						//And the LSH bucket for both of them
-			near_neigh = this->T[i]->find_nearest_min(curve,neigh,neigh_dist,cond,R,r_near,near_neigh,&near_dist,distance);
-		}
-		else{
-			near_neigh = this->T[i]->find_nearest(curve,near_neigh,&near_dist,distance);
-		}
-		if(near_neigh != NULL){					//If we find a neighbor
-			if(!x){								//If we don't have already initialized the nearest
-				x = true;						//Set flag true and initialize the nearest
-				*nearest_dist = near_dist;
-				nearest_neigh = near_neigh; 
-			}
-			else if(*nearest_dist > near_dist){		//Othwerwise compare the distance
-				*nearest_dist = near_dist;
-				nearest_neigh = near_neigh;
-			}
-		}
-	}
-	return nearest_neigh;						//Return the nearest neighbor
+	this->T[bucket]->Bucket_Search(center,object,Grid_Curve,Closest_Neighbors,distance);	
 }*/

@@ -7,6 +7,10 @@
 
 using namespace Eigen;
 
+template <typename T>
+long double Euclidean_Distance(const T & ,const T &);
+
+
 double DFT(const MatrixXd &,const MatrixXd &);
 double DFT(Object &,Object &);
 double DTW(Object &,Object &);

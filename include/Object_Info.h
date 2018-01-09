@@ -9,11 +9,13 @@ using namespace Eigen;
 
 class Object_Info{
 	Object * object;
+	char * id;
 	int flag;
 	MatrixXd * centroid;
 	int second_best;
 public:
 	Object_Info(Object *);
+	Object_Info(Object *,char *);
 	~Object_Info();
 	Object & Get_Object();
 	Object * Get_Object_P();

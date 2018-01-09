@@ -5,6 +5,7 @@
 #include <climits>
 #include "../include/generator.h"
 
+
 #define w 4
 
 using namespace std;
@@ -51,4 +52,9 @@ int probabilistic(const std::vector<double> &p,const std::vector<int> & r,int bu
 	index %=buckets;
 	return index;
 };
+
+
+unsigned long int hash(std::vector<double> pos){
+	return (pos[0]+pos[1])*(pos[0]+pos[1]+1)/2.0 + pos[1];
+}
 

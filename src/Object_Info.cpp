@@ -10,12 +10,24 @@ Object_Info::Object_Info(Object *object){
 	this->flag = 0;
 	this->centroid = NULL;
 	this->second_best = -1;
+	this->id = NULL;
+}
+
+Object_Info::Object_Info(Object *object,char *id){
+	this->object = object;
+	this->flag = 0;
+	this->centroid = NULL;
+	this->second_best = -1;
+	this->id = id;
 }
 
 Object_Info::~Object_Info(){
 	delete this->object;
 	if(this->centroid != NULL){
 		delete this->centroid;
+	}
+	if(this->id){
+		free(this->id);
 	}
 }
 

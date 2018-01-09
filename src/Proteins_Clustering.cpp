@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/main_functions.h"
+#include "../include/protein_main_functions.h"
 #include "../include/Types.h"
 #include "../include/Object_Info.h"
 #include "../include/Distance.h"
@@ -74,7 +74,6 @@ int main(int argc,char **argv){
 	double best_value;
 	double silhouette_value;
 
-	//Random_Initialization(&cluster_centers,k,n);
 	std::vector<int> out;
 	int sil_loop=0;
 	std::vector<int> cluster_centers;
@@ -85,13 +84,6 @@ int main(int argc,char **argv){
 		K_Means_Plusplus(&cluster_centers, k, n, distance);
 	}
 	do{
-		/*std::vector<int> cluster_centers;
-		if(!strcmp(metric,"DFT")){
-			Random_Initialization(&cluster_centers,k,n);
-		}
-		else{
-			K_Means_Plusplus(&cluster_centers, k, n, distance);
-		}*/
 		Clusters clusters;
 		int rem =0;
 		for(unsigned int p=0;p<out.size();p++){
