@@ -1,16 +1,29 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include "../include/Ways.h"
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
-#include "../include/Distance.h"
+#include <iomanip>
 
 using namespace std;
 
-#define MAX_R 0.05
-#define LENGHT 0.005
+extern float max_r;
+extern float length;
+
+
+template <typename T>
+double Euclidean_Distance(T & v1,T &v2){
+ 	long double sum = 0;
+ 	for(unsigned int i = 0;i<v1.size();i++){
+ 		sum += pow((v1[i] - v2[i]),2);
+ 	}
+ 	return sqrt(sum);
+ };
+
+
 
 
 Way::Way(char *id,vector<Point *> *points,vector<int> *junction_split,vector<int> *curvature_length_split){
@@ -47,44 +60,8 @@ void Way::Insert_junction(int index){
 }
 
 
-/*int Way::print(int count){
-	std::vector<int> v(this->junction_split->size()+this->curvature_length_split->size());
-	std::vector<int>::iterator it;
-	sort(this->junction_split->begin(),this->junction_split->end());
-	sort(this->curvature_length_split->begin(),this->curvature_length_split->end());
-	it=std::set_union (this->junction_split->begin(),this->junction_split->end(),
-		this->curvature_length_split->begin(), this->curvature_length_split->end(), v.begin());
-	v.resize(it-v.begin());
-	int j=0;
-	for(unsigned int i=0;i<v.size();i++){
-		if(i == 0 && v[i] == 0){
-			continue;
-		}
-		if(j>v[i]){
-			continue
-		}
-		cout << count++ << ", " << this->id << ", " << v[i]-j+1;
-		for(;j<=v[i];j++){
-			for(unsigned int k=0;k<points->at(j)->size();k++){
-				cout << ", " << points->at(j)->at(k);
-			}
-		}
-		cout << endl;
-	}
-	if(j == points->size()){
-		return count;
-	}
-	cout << count++ << ", " << this->id << ", " << points->size()-j;
-	for(;j<points->size();j++){
-		for(unsigned int k=0;k<points->at(j)->size();k++){
-			cout << ", " << points->at(j)->at(k);
-		}
-	}
-	cout << endl;
-	return count;
-}*/
 
-int Way::print(int count){
+int Way::print(int count,std::ofstream & out){
 	sort(this->junction_split->begin(),this->junction_split->end());
 	int current = 0;
 	int flag = 0;
@@ -97,6 +74,8 @@ int Way::print(int count){
 	double prev = 0;
 	int last = -2;
 	int size = this->junction_split->size();
+
+	//Cut the roads
 	for(unsigned int i=0;i<this->points->size();i++){
 		if(size > j && this->junction_split->at(j) == i){
 			if(this->junction_split->at(j) != 0){
@@ -133,15 +112,13 @@ int Way::print(int count){
 				r = (a*b*c) / (double)sqrt(sum);
 			}
 			prev += b;
-			if(r > MAX_R){
+			if(r > max_r){
 				prev = 0;
 				vec.push_back(i-1);
-				cout << "Curvature: " << current << endl;
 				current = 0;
 			}
-			else if(prev > LENGHT){
+			else if(prev > length){
 				vec.push_back(i-1);
-				cout << "Length " << current <<": " << prev << endl;
 				prev = 0;
 				current = 0;
 			}
@@ -153,9 +130,8 @@ int Way::print(int count){
 			a = Euclidean_Distance(*(this->points->at(i-1)),*(this->points->at(i)));
 			prev += a;
 			current++;
-			if(prev > LENGHT){
+			if(prev > length){
 				vec.push_back(i-1);
-				cout << "Length " << current <<": " << prev << endl;
 				prev = 0;
 				current = 0;
 			}
@@ -164,25 +140,31 @@ int Way::print(int count){
 			current++;
 		}
 	}
+
+	//Print into file
 	int k = 0;
+	j = 0;
 	for(unsigned int i=0;i<vec.size();i++){
-		cout << count++ << ", " << this->id << ", " << vec[i]-k+1;
+		out << count++ << ", " << this->id << ", " << vec[i]-j+1;
 		for(;j<=vec[i];j++){
 			for(unsigned int k=0;k<points->at(j)->size();k++){
-				cout << ", " << points->at(j)->at(k);
+				out << ", " << setprecision(10) << points->at(j)->at(k);
 			}
 		}
-		cout << endl;
-		k = vec[i]+1;
+		out << endl;
+		j = vec[i]+1;
 	}
-	if(k < points->size())
-		cout << count++ << ", " << this->id << ", " << points->size()-k;
-	for(;k<points->size();k++){
-		for(unsigned int j=0;j<points->at(k)->size();j++){
-			cout << ", " << points->at(k)->at(j);
+	flag = 0;
+	if(j < points->size()){
+		out << count++ << ", " << this->id << ", " << points->size()-j;
+		flag = 1;
+	}
+	for(;j<points->size();j++){
+		for(unsigned int k=0;k<points->at(j)->size();k++){
+			out << ", " << setprecision(10) << points->at(j)->at(k);
 		}
 	}
-	cout << endl;
-	cout << "------------" <<endl;
+	if(flag)
+		out << endl;
 	return count;
 }

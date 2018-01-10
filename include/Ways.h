@@ -4,6 +4,7 @@
 #include "Types.h"
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ public:
 	~Way();
 	void Insert_junction(int);
 	void Insert_curvature(int);
-	int print(int);
+	int print(int,ofstream &);
 };
 
 

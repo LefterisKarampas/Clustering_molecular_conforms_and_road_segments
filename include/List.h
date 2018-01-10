@@ -5,10 +5,10 @@
 #include <vector>
 #include "Node.h"
 #include "Types.h"
+#include "Ways.h"
 
 using namespace std;
 
-bool Compare_GridCurves(Point *,Point *);
 
 class List{
 private:
@@ -17,14 +17,10 @@ private:
 public:
 	List();
 	~List();
-	Point * List_Insert(int,Point *,int);
+	Point * List_Insert(int,Point *,int,Way **);
 	int List_Insert(int,Point *);
 	void Set_NULL();
 	void Size();
-	/*void List_Search(int ,Object & ,Point *,std::vector<int> *,
-	std::vector<double> *,long double (*distance)( Object&, Object &));
-	void List_Search(int ,Object & ,Point *,std::vector<int> *,
-		long double (*distance)( Object&, Object &));*/
 
 };
 
