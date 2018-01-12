@@ -6,21 +6,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/Types.h"
-#include "../include/HashTable.h"
-#include "../include/Ways.h"
+#include "../../include/Types.h"
+#include "../../include/HashTable.h"
+#include "../../include/Ways.h"
 
 #define BUCKETS 200
 
 using namespace std;
-
-float max_r = 0.05;
-float length = 0.005;
-int dim = 2;
-
-void Usage(char * exec){
-	fprintf(stderr,"Usage: %s -i <input_file> -o <output_file> -s <optional> -r <radius> -l <length> -d <dimension>\n",exec);
-}
 
 
 
@@ -45,47 +37,7 @@ int count_lines(char *path){
 
 
 
-int read_args(int argc,char **argv,char **input_file,char ** output_file,int *split_data){
-	if(argc < 5){
-		Usage(argv[0]);
-		exit(1);
-	}
-	int i = 1;
-	while(i<argc){
-		if(!strcmp(argv[i],"-i")){
-			*input_file = (char *)malloc(sizeof(char)*(strlen(argv[i+1])+1));
-			strcpy(*input_file,argv[i+1]);
-		}
-		else if(!strcmp(argv[i],"-s")){
-			*split_data = 1;
-			i--;
-		}
-		else if(!strcmp(argv[i],"-o")){
-			*output_file = (char *)malloc(sizeof(char)*(strlen(argv[i+1])+1));
-			strcpy(*output_file,argv[i+1]);
-		}
-		else if(!strcmp(argv[i],"-r")){
-			max_r = atof(argv[i+1]);
-		}
-		else if(!strcmp(argv[i],"-l")){
-			length = atof(argv[i+1]);
-		}
-		else if(!strcmp(argv[i],"-d")){
-			dim = atoi(argv[i+1]);
-		}
-		else if(!strcmp(argv[i],"-h")){
-			Usage(argv[0]);
-			exit(0);
-		}
-		i+=2;
-	}
-	return 0;
-}
-
-
-
-
-void read_ways(char *input_file,char *output_file){
+void read_ways(char *input_file,char *output_file,int dim,float max_r,float length){
 	string line;
 	ifstream myfile(input_file);
 	if (!myfile.is_open())
@@ -115,7 +67,6 @@ void read_ways(char *input_file,char *output_file){
 		char *id;
 		std::vector<Point *> * points = new std::vector<Point *>();
 		std::vector<int> * junction_split = new vector<int>();
-		std::vector<int> * curvature_length_split = new vector<int>();
 		while(temp != NULL){
 			if(k == 0){
 				id = (char *)malloc(sizeof(char)*(strlen(temp)+1));
@@ -179,7 +130,7 @@ void read_ways(char *input_file,char *output_file){
 			k++;
 			temp = strtok(NULL,", ");
 		}
-		ways[loop] = new Way(id,points,junction_split,curvature_length_split);
+		ways[loop] = new Way(id,points,junction_split);
 		loop++;
 	}
 	int count = 0;
@@ -188,7 +139,7 @@ void read_ways(char *input_file,char *output_file){
 		out.open("./roads/segments.csv");
 	}
 	for(int i=0;i<loop;i++){
-		count = ways[i]->print(count,out);
+		count = ways[i]->print(count,out,max_r,length);
 	}
 	out.close();
 	int n;

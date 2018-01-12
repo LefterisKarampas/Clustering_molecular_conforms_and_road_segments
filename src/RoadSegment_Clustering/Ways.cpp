@@ -2,16 +2,13 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
-#include "../include/Ways.h"
+#include "../../include/Ways.h"
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
 #include <iomanip>
 
 using namespace std;
-
-extern float max_r;
-extern float length;
 
 
 template <typename T>
@@ -26,11 +23,10 @@ double Euclidean_Distance(T & v1,T &v2){
 
 
 
-Way::Way(char *id,vector<Point *> *points,vector<int> *junction_split,vector<int> *curvature_length_split){
+Way::Way(char *id,vector<Point *> *points,vector<int> *junction_split){
 	this->id = id;
 	this->points = points;
 	this->junction_split = junction_split;
-	this->curvature_length_split = curvature_length_split;
 }
 
 
@@ -38,7 +34,6 @@ Way::~Way(){
 	free(this->id);
 	delete this->points;
 	delete this->junction_split;
-	delete this->curvature_length_split;
 }
 
 void Way::Insert_junction(int index){
@@ -61,7 +56,7 @@ void Way::Insert_junction(int index){
 
 
 
-int Way::print(int count,std::ofstream & out){
+int Way::print(int count,std::ofstream & out,float max_r,float length){
 	sort(this->junction_split->begin(),this->junction_split->end());
 	int current = 0;
 	int flag = 0;

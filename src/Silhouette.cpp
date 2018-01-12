@@ -1,7 +1,7 @@
 #include "../include/Object_Info.h"
 #include "../include/Cluster.h"
 #include "../include/Types.h"
-#include "../include/Distance.h"
+#include "../include/Distance_Metric.h"
 #include <vector>
 #include <iostream>
 
@@ -10,6 +10,8 @@ extern Object_Info ** object_info;
 extern double ** Distance_Table;
 
 using namespace std;
+
+static double best = 0;
 
 
 int Silhouette(Clusters clusters,double (*distance)(int,int),vector<int> *out,double *silhouette_value){
@@ -55,6 +57,9 @@ int Silhouette(Clusters clusters,double (*distance)(int,int),vector<int> *out,do
 	}
 	*silhouette_value = overall/(double)clusters.size();
 	//cout << "Overall: " << *silhouette_value << endl;
-	//cout << "For k: " << clusters.size() << " All: " << all/(double)count << endl;
+	/*if(best < all/(double)count){
+		best = all/(double)count;
+		cout << "For k: " << clusters.size() << " All: " << all/(double)count << endl;
+	}*/
 	return num_clusters;
 }

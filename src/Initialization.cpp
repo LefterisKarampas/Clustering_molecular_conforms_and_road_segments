@@ -6,7 +6,7 @@
 
 #include "../include/Initialization.h"
 #include "../include/Object_Info.h"
-#include "../include/Distance.h"
+#include "../include/Distance_Metric.h"
 
 using namespace std;
 

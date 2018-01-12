@@ -1,5 +1,4 @@
 #include <iostream>
-#include "../include/Distance.h"
 #include "../include/Types.h"
 #include "../include/Transform.h"
 #include <vector>
@@ -7,18 +6,39 @@
 #include <math.h>
 #include "../include/Eigen/SVD"
 #include "../include/Eigen/Dense"
+#include "../include/Object_Info.h"
 
 
 using namespace std;
 using namespace Eigen;
 
-extern Object_Info ** object_info;
+template <typename T>
+T my_max(T x, T y){
+	return (x>y?x:y);
+};
 
+template <typename T>
+T my_min(T x, T y){
+	return (x>y?y:x);
+};
+
+
+template <typename T>
+double Euclidean_Distance(const T & v1,const T &v2){
+ 	long double sum = 0;
+ 	for(unsigned int i = 0;i<v1.size();i++){
+ 		sum += pow((v1[i] - v2[i]),2);
+ 	}
+ 	return sqrt(sum);
+ };
+
+
+extern Object_Info ** object_info;
 
 double DFT(Object & v1,Object &v2){
 	unsigned int n = v1.size();
 	unsigned int m = v2.size();
-	long double C[n][m];
+	double C[n][m];
 	for(unsigned int i=0;i<n;i++){
 		for(unsigned int j=0;j<m;j++){
 			if(i == 0 && j == 0){
@@ -42,7 +62,7 @@ double DFT(Object & v1,Object &v2){
 double DFT(const MatrixXd & v1, const MatrixXd & v2){
 	unsigned int n = v1.rows();
 	unsigned int m = v2.rows();
-	long double C[n][m];
+	double C[n][m];
 	for(unsigned int i=0;i<n;i++){
 		for(unsigned int j=0;j<m;j++){
 			if(i == 0 && j == 0){
@@ -66,7 +86,7 @@ double DFT(const MatrixXd & v1, const MatrixXd & v2){
 double DTW(Object &v1,Object &v2){
 	unsigned int n = v1.size();
 	unsigned int m = v2.size();
-	long double C[n][m];
+	double C[n][m];
 	for(unsigned int i=0;i<n;i++){
 		for(unsigned int j=0;j<m;j++){
 			if(i == 0 && j == 0){
@@ -89,7 +109,7 @@ double DTW(Object &v1,Object &v2){
 double DTW(const MatrixXd & v1, const MatrixXd & v2){
 	unsigned int n = v1.rows();
 	unsigned int m = v2.rows();
-	long double C[n][m];
+	double C[n][m];
 	for(unsigned int i=0;i<n;i++){
 		for(unsigned int j=0;j<m;j++){
 			if(i == 0 && j == 0){
@@ -125,10 +145,21 @@ double c_RMSD(int indexX,int indexY){
 	}
 
 	MatrixXd Q;
-	int n = X->rows();
-	Q = Rotate(*X,*Y);
-	
-	return ((*X)*Q - (*Y)).norm() / (double)sqrt(n);
+	int x_size = X->rows();
+	int y_size = Y->rows();
+	if(x_size > y_size){
+		Q = Rotate(X->topRows(y_size),*Y);
+		return ((X->topRows(y_size))*Q - (*Y)).norm() / (double)sqrt(x_size);
+
+	}
+	else if(x_size < y_size){
+		Q = Rotate(*X,Y->topRows(x_size));
+		return ((*X)*Q - (Y->topRows(x_size))).norm() / (double)sqrt(x_size);
+	}
+	else{
+		Q = Rotate(*X,*Y);
+		return ((*X)*Q - (*Y)).norm() / (double)sqrt(x_size);
+	}
 }
 
 double Frechet(int indexX,int indexY){
@@ -146,8 +177,20 @@ double Frechet(int indexX,int indexY){
 	}
 
 	MatrixXd Q;
-	Q = Rotate(*X,*Y);
-	return DFT((*X)*Q,*Y);
+	int x_size = X->rows();
+	int y_size = Y->rows();
+	if(x_size > y_size){
+		Q = Rotate(X->topRows(y_size),*Y);
+		return DFT((X->topRows(y_size))*Q,*Y);
+	}
+	else if(x_size < y_size){
+		Q = Rotate(*X,Y->topRows(x_size));
+		return DFT((*X)*Q,Y->topRows(x_size));
+	}
+	else{
+		Q = Rotate(*X,*Y);
+		return DFT((*X)*Q,*Y);
+	}
 }
 
 double DTW(int indexX,int indexY){
@@ -165,8 +208,20 @@ double DTW(int indexX,int indexY){
 	}
 
 	MatrixXd Q;
-	return DTW((*X)*Q,*Y);
-	Q = Rotate(*X,*Y);
+	int x_size = X->rows();
+	int y_size = Y->rows();
+	if(x_size > y_size){
+		Q = Rotate(X->topRows(y_size),*Y);
+		return DTW((X->topRows(y_size))*Q,*Y);
+	}
+	else if(x_size < y_size){
+		Q = Rotate(*X,Y->topRows(x_size));
+		return DTW((*X)*Q,Y->topRows(x_size));
+	}
+	else{
+		Q = Rotate(*X,*Y);
+		return DTW((*X)*Q,*Y);
+	}
 }
 
 

@@ -37,7 +37,7 @@ int find_min(double x1,double x2,double x3){
 Object * MeanFrechetMatrix(const MatrixXd &x,const MatrixXd &y,double *dist){
 	unsigned int n = x.rows();
 	unsigned int m = y.rows();
-	long double C[n][m];
+	double C[n][m];
 	for(unsigned int i=0;i<n;i++){
 		for(unsigned int j=0;j<m;j++){
 			if(i == 0 && j == 0){

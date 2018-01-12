@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
-#include "../include/Ways.h"
-#include "../include/Node.h"
-#include "../include/NodeWay.h"
+#include "../../include/Ways.h"
+#include "../../include/Node.h"
+#include "../../include/NodeWay.h"
 
 #include <cstdlib>
 using namespace std;

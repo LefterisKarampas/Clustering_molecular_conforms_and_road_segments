@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctime>
-#include "../include/Object_Info.h"
-#include "../include/Types.h"
+#include "../../include/Object_Info.h"
+#include "../../include/Types.h"
 
 using namespace std;
 

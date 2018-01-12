@@ -5,15 +5,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/protein_main_functions.h"
-#include "../include/Types.h"
-#include "../include/Object_Info.h"
-#include "../include/Distance.h"
-#include "../include/Initialization.h"
-#include "../include/Assignment.h"
-#include "../include/Update.h"
-#include "../include/Cluster.h"
-#include "../include/Silhouette.h"
+#include "../../include/protein_main_functions.h"
+#include "../../include/Types.h"
+#include "../../include/Object_Info.h"
+#include "../../include/Distance_Metric.h"
+#include "../../include/Initialization.h"
+#include "../../include/Assignment.h"
+#include "../../include/Update.h"
+#include "../../include/Cluster.h"
+#include "../../include/Silhouette.h"
 
 
 Object_Info ** object_info;
