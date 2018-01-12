@@ -1,13 +1,13 @@
-#include "../include/Assignment.h"
-#include "../include/Object_Info.h"
-#include "../include/Cluster.h"
-#include "../include/LSH_Curve.h"
-#include "../include/Distance_Metric.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <stdio.h>
 #include <cstdlib>
+#include "../../include/Assignment.h"
+#include "../../include/Object_Info.h"
+#include "../../include/Cluster.h"
+#include "../../include/LSH_Curve.h"
+#include "../../include/Distance_Metric.h"
 
 
 using namespace std;

@@ -8,8 +8,8 @@
 using namespace std;
 
 void Usage(char *);
-int read_args(int ,char **,char **,char ** ,char **,int *,char **,float *,float *,int *);
-int read_dataset(char *,Object_Info *** ,int);
-void print_clustering(Clusters ,ofstream &,double ,int );
+int read_args(int ,char **,char **,char ** ,char **,int *,char **,float *,float *,int *,int *);
+int read_dataset(char *,Object_Info *** ,int,int);
+
 
 #endif

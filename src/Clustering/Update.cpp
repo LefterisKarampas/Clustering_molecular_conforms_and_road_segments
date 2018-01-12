@@ -1,9 +1,9 @@
-#include "../include/Update.h"
-#include "../include/Object_Info.h"
-#include "../include/Cluster.h"
-#include "../include/Distance_Metric.h"
-#include "../include/Mean_Frechet.h"
-#include "../include/Types.h"
+#include "../../include/Update.h"
+#include "../../include/Object_Info.h"
+#include "../../include/Cluster.h"
+#include "../../include/Distance_Metric.h"
+#include "../../include/Mean_Frechet.h"
+#include "../../include/Types.h"
 #include <iostream>
 #include <vector>
 

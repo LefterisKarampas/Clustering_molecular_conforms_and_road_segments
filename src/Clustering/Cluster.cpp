@@ -1,7 +1,7 @@
-#include "../include/Types.h"
-#include "../include/Cluster.h"
 #include <iostream>
 #include <vector>
+#include "../../include/Types.h"
+#include "../../include/Cluster.h"
 
 using namespace std;
 

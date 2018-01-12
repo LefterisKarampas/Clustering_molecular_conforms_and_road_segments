@@ -1,12 +1,12 @@
 #include <iostream>
-#include "../include/Types.h"
-#include "../include/Transform.h"
 #include <vector>
 #include <algorithm>    // std::reverse
 #include <math.h>
-#include "../include/Eigen/SVD"
-#include "../include/Eigen/Dense"
-#include "../include/Object_Info.h"
+#include "../../include/Eigen/SVD"
+#include "../../include/Eigen/Dense"
+#include "../../include/Object_Info.h"
+#include "../../include/Types.h"
+#include "../../include/Transform.h"
 
 
 using namespace std;
@@ -212,7 +212,7 @@ double DTW(int indexX,int indexY){
 	int y_size = Y->rows();
 	if(x_size > y_size){
 		Q = Rotate(X->topRows(y_size),*Y);
-		return DTW((X->topRows(y_size))*Q,*Y);
+		return DTW(X->topRows(y_size)*Q,*Y);
 	}
 	else if(x_size < y_size){
 		Q = Rotate(*X,Y->topRows(x_size));
@@ -230,6 +230,10 @@ double Find_Distance(int x,int y,double(*distance)(int,int),double ** Distance_T
 	double dist;
 	int index_b;
 	int index_l;
+
+	if(x == y){
+		return 0;
+	}
 
 	if(x > y){
 		index_b = x;

@@ -2,9 +2,9 @@
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
-#include "../include/Grid.h"
-#include "../include/generator.h"
-#include "../include/Types.h"
+#include "../../include/Grid.h"
+#include "../../include/generator.h"
+#include "../../include/Types.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ Grid::~Grid(){
 }
 
 
-Point * Grid::Create_GridCurve(const Object & v){		//Create gric_curve
+Point * Grid::Create_Point(const Object & v){		//Create gric_curve
 	Point *vec = new Point();
 	double prev;
 	//for each point

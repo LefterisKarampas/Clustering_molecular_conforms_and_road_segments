@@ -15,7 +15,7 @@ class Grid{
 public:
 	Grid(int,int);
 	~Grid();
-	Point * Create_GridCurve(const Object &);
+	Point * Create_Point(const Object &);
 };
 
 

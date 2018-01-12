@@ -1,10 +1,10 @@
-#include "../include/Eigen/SVD"
-#include "../include/Eigen/Dense"
-#include "../include/Object_Info.h"
-#include "../include/Types.h"
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include "../../include/Eigen/SVD"
+#include "../../include/Eigen/Dense"
+#include "../../include/Object_Info.h"
+#include "../../include/Types.h"
 
 using namespace std;
 using namespace Eigen;
@@ -95,8 +95,9 @@ MatrixXd * Translate(Object *object){
 
 MatrixXd Rotate(MatrixXd X,MatrixXd Y){
  	MatrixXd m = X.transpose() * Y;
+ 	int dim = Y.cols();
 	JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
-	if((svd.singularValues())(2) <= 0 ){
+	if((dim == 3) && (svd.singularValues())(dim-1) <= 0 ){
 		cerr << "S3 <= 0" << endl;
 		exit(1);
 	}
@@ -104,7 +105,7 @@ MatrixXd Rotate(MatrixXd X,MatrixXd Y){
 	MatrixXd Q = U * svd.matrixV().transpose();
 	if(Q.determinant() < 0){
 		for(unsigned int j =0;j<Q.cols();j++){
-			U(2,j) = -U(2,j);
+			U(dim-1,j) = -U(dim-1,j);
 		}
 		Q = U * svd.matrixV().transpose();
 	}

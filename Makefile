@@ -1,26 +1,33 @@
 all: proteins segmentation segments
 PC = ./src/Proteins_Clustering
 RSC = ./src/RoadSegment_Clustering
+DI = ./src/Distance
+CL = ./src/Clustering
+LSH= ./src/LSH
+LIBS = -I ./include/Eigen
+
 
 proteins:
 	mkdir -p ./build ./results
-	
 	g++ -o ./build/proteins_clustering $(PC)/Proteins_Clustering.cpp $(PC)/protein_main_functions.cpp \
-	./src/Object_Info.cpp ./src/Distance_Metric.cpp ./src/Mean_Frechet.cpp \
-	./src/Transform.cpp ./src/Initialization.cpp ./src/Cluster.cpp ./src/Update.cpp \
-	./src/Assignment.cpp ./src/Silhouette.cpp -I ./include/Eigen
+	$(CL)/Object_Info.cpp $(DI)/Distance_Metric.cpp $(CL)/Mean_Frechet.cpp \
+	$(DI)/Transform.cpp $(CL)/Initialization.cpp $(CL)/Cluster.cpp $(CL)/Update.cpp \
+	$(CL)/Assignment.cpp $(CL)/Silhouette.cpp $(CL)/Clustering.cpp $(LIBS)
 
 segmentation:
-	g++ -o ./build/ways_segmentation $(RSC)/Road_Segmentation.cpp ./src/HashTable.cpp ./src/List.cpp \
-	./src/Node.cpp ./src/HashFunctions.cpp ./src/generator.cpp ./src/Object_Info.cpp $(RSC)/Ways.cpp \
+	mkdir -p ./build
+	g++ -o ./build/ways_segmentation $(RSC)/Road_Segmentation.cpp $(LSH)/HashTable.cpp $(LSH)/List.cpp \
+	$(LSH)/Node.cpp $(LSH)/HashFunctions.cpp ./src/generator.cpp $(CL)/Object_Info.cpp $(RSC)/Ways.cpp \
 	$(RSC)/NodeWay.cpp $(RSC)/Road_Segmentation_Functions.cpp
 
 segments:
+	mkdir -p ./build ./results 
 	g++ -o ./build/segments_clustering $(RSC)/Segments_Clustering.cpp $(RSC)/Segments_main_functions.cpp \
-	./src/HashTable.cpp ./src/List.cpp ./src/Node.cpp ./src/HashFunctions.cpp ./src/generator.cpp \
-	./src/Object_Info.cpp $(RSC)/Ways.cpp $(RSC)/NodeWay.cpp $(RSC)/Road_Segmentation_Functions.cpp \
-	./src/Distance_Metric.cpp ./src/Mean_Frechet.cpp ./src/Transform.cpp ./src/Initialization.cpp \
-	./src/Cluster.cpp ./src/Update.cpp ./src/Assignment.cpp ./src/Silhouette.cpp -I ./include/Eigen
+	$(LSH)/HashTable.cpp $(LSH)/List.cpp $(LSH)/Node.cpp $(LSH)/HashFunctions.cpp ./src/generator.cpp \
+	$(CL)/Object_Info.cpp $(RSC)/Ways.cpp $(RSC)/NodeWay.cpp $(RSC)/Road_Segmentation_Functions.cpp \
+	$(DI)/Distance_Metric.cpp $(CL)/Mean_Frechet.cpp $(DI)/Transform.cpp $(CL)/Initialization.cpp \
+	$(CL)/Cluster.cpp $(CL)/Update.cpp $(CL)/Assignment.cpp $(CL)/Silhouette.cpp \
+	$(CL)/Clustering.cpp $(LIBS)
 
 clean:
 	rm -rf ./build/* ./results/*.dat

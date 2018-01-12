@@ -116,21 +116,3 @@ void read_dataset(char *input_file,Object_Info *** object_info,int *n,int *m){
 	}
 	myfile.close();
 }
-
-void print_clustering(Clusters clusters,ofstream &output,double silhouette,int k){
-	output << k << endl;
-	output << silhouette << endl;
-	for(int i=0;i<k;i++){
-		Neighbors neigh = clusters[i]->Cluster_Get_Neighbors();
-		if(neigh.size() == 0){
-			output << "Failed! " << clusters[i]->Cluster_Get_Center();
-		}
-		//output << "Cluster with center: "<< clusters[i]->Cluster_Get_Center() << endl;
-		std::sort(neigh.begin(),neigh.end());
-		for(unsigned int j=0;j<neigh.size();j++){
-			output << neigh[j] << "\t";
-		}
-		output << endl;
-	}
-	output << endl;
-}

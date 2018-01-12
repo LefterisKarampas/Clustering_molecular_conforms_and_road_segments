@@ -15,7 +15,7 @@ void Usage(char * exec){
 }
 
 int read_args(int argc,char **argv,char **input_file,char ** output_file,char **segmentation,int *k,
-	char **metric,float *max_r,float *length,int *dim){
+	char **metric,float *max_r,float *length,int *dim,int *lsh){
 	if(argc < 3){
 		Usage(argv[0]);
 		exit(1);
@@ -56,6 +56,10 @@ int read_args(int argc,char **argv,char **input_file,char ** output_file,char **
 				return 1;
 			}
 		}
+		else if(!strcmp(argv[i],"-lsh")){
+			*lsh = 1;
+			i--;
+		}
 		else if(!strcmp(argv[i],"-h")){
 			Usage(argv[0]);
 			exit(0);
@@ -66,7 +70,7 @@ int read_args(int argc,char **argv,char **input_file,char ** output_file,char **
 }
 
 
-int read_dataset(char *input_file,Object_Info *** object_info,int dim){
+int read_dataset(char *input_file,Object_Info *** object_info,int dim,int lsh_flag){
 	string line;
 	ifstream myfile(input_file);
 	if (!myfile.is_open())
@@ -97,7 +101,6 @@ int read_dataset(char *input_file,Object_Info *** object_info,int dim){
 			}
 			else if(k == 2){
 				nodes = atoi(&(token.c_str()[1]));
-				cout << "Nodes: " << nodes << endl;
 			}
 			else{
 				double x;
@@ -119,6 +122,9 @@ int read_dataset(char *input_file,Object_Info *** object_info,int dim){
 			k++;
 		}
 		(*object_info)[num] = new Object_Info(object);
+		if(lsh_flag){
+			;
+		}
 		num++;
 	}
 	if(num != segments){
@@ -132,21 +138,3 @@ int read_dataset(char *input_file,Object_Info *** object_info,int dim){
 	return segments;
 }
 
-
-void print_clustering(Clusters clusters,ofstream &output,double silhouette,int k){
-	output << k << endl;
-	output << silhouette << endl;
-	for(int i=0;i<k;i++){
-		Neighbors neigh = clusters[i]->Cluster_Get_Neighbors();
-		if(neigh.size() == 0){
-			output << "Failed! " << clusters[i]->Cluster_Get_Center();
-		}
-		//output << "Cluster with center: "<< clusters[i]->Cluster_Get_Center() << endl;
-		std::sort(neigh.begin(),neigh.end());
-		for(unsigned int j=0;j<neigh.size();j++){
-			output << neigh[j] << "\t";
-		}
-		output << endl;
-	}
-	output << endl;
-}

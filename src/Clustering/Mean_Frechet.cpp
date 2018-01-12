@@ -1,11 +1,11 @@
 #include <iostream>
-#include "../include/Distance.h"
-#include "../include/Types.h"
-#include "../include/Transform.h"
 #include <vector>
 #include <algorithm>    // std::reverse
 #include <math.h>
-#include "../include/Eigen/Dense"
+#include "../../include/Eigen/Dense"
+#include "../../include/Distance.h"
+#include "../../include/Types.h"
+#include "../../include/Transform.h"
 
 using namespace Eigen;
 using namespace std;

@@ -1,10 +1,10 @@
-#include "../include/HashTable.h"
-#include "../include/List.h"
-#include "../include/Types.h"
 #include <iostream>
 #include <limits.h>
 #include <stdlib.h>
 #include <vector>
+#include "../../include/HashTable.h"
+#include "../../include/List.h"
+#include "../../include/Types.h"
 
 
 

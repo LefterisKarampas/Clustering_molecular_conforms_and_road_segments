@@ -4,9 +4,9 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "../include/Initialization.h"
-#include "../include/Object_Info.h"
-#include "../include/Distance_Metric.h"
+#include "../../include/Initialization.h"
+#include "../../include/Object_Info.h"
+#include "../../include/Distance_Metric.h"
 
 using namespace std;
 

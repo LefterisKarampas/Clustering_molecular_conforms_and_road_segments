@@ -14,6 +14,7 @@
 #include "../../include/Update.h"
 #include "../../include/Cluster.h"
 #include "../../include/Silhouette.h"
+#include "../../include/Clustering.h"
 
 
 Object_Info ** object_info;
@@ -69,73 +70,7 @@ int main(int argc,char **argv){
 		output.open("./results/crmsd.dat");
 	}
 
-	int prev_k;
-	int best_k;
-	double best_value;
-	double silhouette_value;
-
-	std::vector<int> out;
-	int sil_loop=0;
-	std::vector<int> cluster_centers;
-	if(!strcmp(metric,"DFT")){
-		Random_Initialization(&cluster_centers,k,n);
-	}
-	else{
-		K_Means_Plusplus(&cluster_centers, k, n, distance);
-	}
-	do{
-		Clusters clusters;
-		int rem =0;
-		for(unsigned int p=0;p<out.size();p++){
-			cluster_centers.erase(cluster_centers.begin()+(out[p]-rem));
-			rem++;
-		}
-		for(int i=0;i<k;i++){
-			int new_center = cluster_centers[i];
-			Cluster *temp = new Cluster(new_center);
-			clusters.push_back(temp);
-		}
-		
-		double objective_value,prev;
-		int loop = 0;
-
-		objective_value = Lloyd_Assignment(&clusters,n,distance);
-		do{
-			PAM_Improved(&clusters,distance);
-			prev = objective_value;
-			loop++;
-			objective_value = Lloyd_Assignment(&clusters,n,distance);
-		}while(loop < 20 && (abs(prev - objective_value) > 0.005));
-
-		prev_k = k;
-		out.clear();
-		k = Silhouette(clusters,distance,&out,&silhouette_value);
-		for(int i=0;i<n;i++){
-			object_info[i]->Clear_Flag();
-		}
-		if(sil_loop == 0){
-			best_value = silhouette_value;
-			best_k  = prev_k;
- 		}
- 		else if(best_value < silhouette_value){
- 			best_value = silhouette_value;
- 			best_k = prev_k;
- 		}
- 		sil_loop++;
-
-		print_clustering(clusters,output,silhouette_value,prev_k);
-		for(int i=0;i<prev_k;i++){
-			delete clusters[i];
-		}
-		if(prev_k == k){
-			k--;
-		}
-		if(prev_k > 200){
-			prev_k = k/3;
-		}
-	}while(k>1 && silhouette_flag);
-	if(silhouette_flag)
-		cout << "Best silhouette_value " << best_value << " with " << best_k << " clusters" << endl;
+	Clustering(k,n,object_info,distance,output,silhouette_flag);
 
 	//Free allocated space
 	for(int i=0;i<n+first_k;i++){
@@ -147,6 +82,7 @@ int main(int argc,char **argv){
 	delete[] object_info;
 	free(Distance_Table);
 	//delete clusters;
+	output.close();
 	free(input_file);
 	free(metric);
 
