@@ -1,7 +1,7 @@
 #ifndef _WAYS_H_
 #define _WAYS_H_
 
-#include "Types.h"
+#include "../Types.h"
 #include <iostream>
 #include <vector>
 #include <fstream>

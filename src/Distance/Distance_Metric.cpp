@@ -4,9 +4,9 @@
 #include <math.h>
 #include "../../include/Eigen/SVD"
 #include "../../include/Eigen/Dense"
-#include "../../include/Object_Info.h"
+#include "../../include/Clustering/Object_Info.h"
 #include "../../include/Types.h"
-#include "../../include/Transform.h"
+#include "../../include/Distance/Transform.h"
 
 
 using namespace std;
@@ -176,6 +176,34 @@ double Frechet(int indexX,int indexY){
 		Y = Translate(indexY);
 	}
 
+	MatrixXd Q;
+	int x_size = X->rows();
+	int y_size = Y->rows();
+	if(x_size > y_size){
+		Q = Rotate(X->topRows(y_size),*Y);
+		return DFT((X->topRows(y_size))*Q,*Y);
+	}
+	else if(x_size < y_size){
+		Q = Rotate(*X,Y->topRows(x_size));
+		return DFT((*X)*Q,Y->topRows(x_size));
+	}
+	else{
+		Q = Rotate(*X,*Y);
+		return DFT((*X)*Q,*Y);
+	}
+}
+
+double Frechet(int indexX,Object * object){
+	MatrixXd *X;
+	MatrixXd *Y;
+
+	X = object_info[indexX]->Get_Centroid();
+	if(X == NULL){
+		X = Translate(indexX);
+	}
+	
+	Y = Translate(object);
+	
 	MatrixXd Q;
 	int x_size = X->rows();
 	int y_size = Y->rows();

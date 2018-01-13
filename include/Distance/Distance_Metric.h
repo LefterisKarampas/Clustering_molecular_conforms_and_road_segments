@@ -2,8 +2,8 @@
 #define DISTANCE_METRIC_H_
 
 #include <vector>
-#include "Types.h"
-#include "Eigen/Dense"
+#include "../Types.h"
+#include "../Eigen/Dense"
 
 using namespace Eigen;
 
@@ -17,6 +17,7 @@ double DTW(Object &,Object &);
 double DTW(const MatrixXd & , const MatrixXd & );
 double c_RMSD(int,int);
 double Frechet(int,int);
+double Frechet(int ,Object *);
 double DTW(int ,int );
 double Find_Distance(int,int,double(*distance)(int,int),double ** Distance_Table);
 

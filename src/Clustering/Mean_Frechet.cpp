@@ -3,9 +3,9 @@
 #include <algorithm>    // std::reverse
 #include <math.h>
 #include "../../include/Eigen/Dense"
-#include "../../include/Distance.h"
+#include "../../include/Distance/Distance.h"
 #include "../../include/Types.h"
-#include "../../include/Transform.h"
+#include "../../include/Distance/Transform.h"
 
 using namespace Eigen;
 using namespace std;
@@ -117,19 +117,28 @@ Object * MeanFrechet(Object *v1,Object *v2,double *dist){
 	MatrixXd *X;
 	MatrixXd *Y;
 	//Translate them
-	cout << "Translate" << endl;
 	X = Translate(v1);
 	Y = Translate(v2);
-	cout << "After Translate" << endl;
+	
 	//Rotate
 	MatrixXd Q;
-	cout << "Rotate"  << endl;
-	Q = Rotate(*X,*Y);
-	cout <<"After Rotate" << endl;
+	int x_size = X->rows();
+	int y_size = Y->rows();
+	Object *obj;
+	if(x_size > y_size){
+		Q = Rotate(X->topRows(y_size),*Y);
+		obj = MeanFrechetMatrix((X->topRows(y_size))*Q,*Y,dist);
+	}
+	else if(x_size < y_size){
+		Q = Rotate(*X,Y->topRows(x_size));
+		obj = MeanFrechetMatrix((*X)*Q,Y->topRows(x_size),dist);
+	}
+	else{
+		Q = Rotate(*X,*Y);
+		obj = MeanFrechetMatrix((*X)*Q,*Y,dist);
+	}
 	//Create Frechet Matrix 
-	cout << "HERE"  << endl;
-	Object *obj = MeanFrechetMatrix((*X)*Q,*Y,dist);
-	cout << "OUT"  << endl;
+	
 	delete X;
 	delete Y;
 	return obj;

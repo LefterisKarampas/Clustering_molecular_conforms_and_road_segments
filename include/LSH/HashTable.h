@@ -2,10 +2,10 @@
 #define HASH_TABLE_H_
 
 #include "List.h"
-#include "Types.h"
+#include "../Types.h"
 #include <vector>
 #include <iostream>
-#include "Ways.h"
+#include "../RoadSegment_Clustering/Ways.h"
 
 
 class Bucket{
@@ -16,7 +16,9 @@ public:
 	~Bucket();
 	int Bucket_Insert(int,Point *);
 	Point * Bucket_Insert(int,Point *,int,Way **);
+	void Print_List(std::ofstream &output);
 	void Size();
+	std::vector<int> * Get_Values();
 };
 
 

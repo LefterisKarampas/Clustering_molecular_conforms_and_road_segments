@@ -3,7 +3,7 @@
 #include <vector>
 #include "../../include/Eigen/SVD"
 #include "../../include/Eigen/Dense"
-#include "../../include/Object_Info.h"
+#include "../../include/Clustering/Object_Info.h"
 #include "../../include/Types.h"
 
 using namespace std;

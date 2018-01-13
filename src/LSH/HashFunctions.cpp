@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <climits>
-#include "../../include/HashFunctions.h"
+#include "../../include/LSH/HashFunctions.h"
 #include "../../include/generator.h"
 
 

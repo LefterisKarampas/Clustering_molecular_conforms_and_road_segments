@@ -1,8 +1,7 @@
 #ifndef _ASSIGNMENT_H_
 #define _ASSIGNMENT_H_
 
-#include "Types.h"
-#include "../include/LSH_Curve.h"
+#include "Cluster.h"
 
 double Lloyd_Assignment(Clusters *,int,double (*distance)(int,int));
 

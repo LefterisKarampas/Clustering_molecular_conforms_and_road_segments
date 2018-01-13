@@ -2,7 +2,7 @@
 #define _NODE_H_
 
 #include <iostream>
-#include "Types.h"
+#include "../Types.h"
 
 using namespace std;
 

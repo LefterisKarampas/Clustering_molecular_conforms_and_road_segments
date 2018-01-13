@@ -1,9 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <limits.h>
 #include <stdlib.h>
 #include <vector>
-#include "../../include/HashTable.h"
-#include "../../include/List.h"
+#include "../../include/LSH/HashTable.h"
+#include "../../include/LSH/List.h"
 #include "../../include/Types.h"
 
 
@@ -51,6 +52,18 @@ void Bucket::Size(){
 	}
 }
 
+void Bucket::Print_List(std::ofstream &output){
+	if(this->list != NULL){
+		this->list->Print(output);
+	}
+}
+
+std::vector<int> * Bucket::Get_Values(){
+	if(this->list != NULL){
+		return this->list->Get_Values();
+	}
+	return NULL;
+}
 
 
 

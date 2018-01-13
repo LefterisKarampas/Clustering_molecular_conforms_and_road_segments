@@ -3,11 +3,10 @@
 #include <algorithm>
 #include <stdio.h>
 #include <cstdlib>
-#include "../../include/Assignment.h"
-#include "../../include/Object_Info.h"
-#include "../../include/Cluster.h"
-#include "../../include/LSH_Curve.h"
-#include "../../include/Distance_Metric.h"
+#include "../../include/Clustering/Assignment.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/Clustering/Cluster.h"
+#include "../../include/Distance/Distance_Metric.h"
 
 
 using namespace std;
@@ -21,6 +20,8 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 	}
 	double objective_value = 0;
 	//First assignment
+	int flag = 0;
+	int t;
 	if(object_info[0]->Get_Flag() == 0){
 		for(int i=0;i<n;i++){
 			int min;
@@ -29,7 +30,15 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 			double second_dist;
 			for(unsigned int j=0;j<clusters->size();j++){
 				int center = (*clusters)[j]->Cluster_Get_Center();
-				double dist = Find_Distance(center,i,distance,Distance_Table);
+				double dist;
+				if(center == i){
+					flag = 1;
+					t = j;
+					dist = 0;
+				}
+				else{
+					dist = Find_Distance(center,i,distance,Distance_Table);
+				}
 				if(j==0){
 					min = j;
 					min_dist = dist;
@@ -45,21 +54,30 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 					second_dist = dist;
 				}
 			}
-			(*clusters)[min]->Cluster_Insert(i,min_dist);
-			objective_value += min_dist;
-			object_info[i]->Increase_Flag();
-			object_info[i]->Set_second_neigh(second_best);
+			if(flag && min != t){
+				(*clusters)[t]->Cluster_Insert(i,min_dist);
+				objective_value += min_dist;
+				object_info[i]->Increase_Flag();
+				object_info[i]->Set_second_neigh(min);
+			}
+			else{
+				(*clusters)[min]->Cluster_Insert(i,min_dist);
+				objective_value += min_dist;
+				object_info[i]->Increase_Flag();
+				object_info[i]->Set_second_neigh(second_best);
+			}
+			flag = 0;
 		}
 	}
 	else{
-		int flag = object_info[0]->Get_Flag();
+		Neighbors *new_neigh[clusters->size()];
+		for(unsigned int i=0;i<clusters->size();i++){
+			new_neigh[i] = new Neighbors();
+		}
 		for(unsigned int i=0;i<clusters->size();i++){
 			int removed = 0;
 			std::vector<int> neigh = (*clusters)[i]->Cluster_Get_Neighbors();
 			for(unsigned int j=0;j<neigh.size();j++){
-				if(object_info[neigh[j]]->Get_Flag() > flag){
-					continue;
-				}
 				int min;
 				double min_dist;
 				int second_best;
@@ -67,7 +85,14 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 				for(unsigned int k=0;k<clusters->size();k++){
 					int center = (*clusters)[k]->Cluster_Get_Center();
 					double dist;
-					dist = Find_Distance(center,neigh[j],distance,Distance_Table);
+					if(center == neigh[j]){
+						dist = 0;
+						flag = 1;
+						t = k;
+					}
+					else{
+						dist = Find_Distance(center,neigh[j],distance,Distance_Table);
+					}
 					if(k==0){
 						min = k;
 						min_dist = dist;
@@ -83,15 +108,23 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 						second_dist = dist;
 					}
 				}
-				if(min != i){
-					(*clusters)[min]->Cluster_Insert(neigh[j],min_dist);
-					(*clusters)[i]->Cluster_Remove_Neigh(j-removed);
-					removed++;
+				if(flag && (min != t)){
+					new_neigh[t]->push_back(neigh[j]);
+					objective_value += min_dist;
+					object_info[neigh[j]]->Set_second_neigh(min);
+					object_info[neigh[j]]->Increase_Flag();
 				}
-				objective_value += min_dist;
-				object_info[neigh[j]]->Set_second_neigh(second_best);
-				object_info[neigh[j]]->Increase_Flag();
+				else{
+					new_neigh[min]->push_back(neigh[j]);
+					objective_value += min_dist;
+					object_info[neigh[j]]->Set_second_neigh(second_best);
+					object_info[neigh[j]]->Increase_Flag();
+				}
+				flag = 0;
 			}
+		}
+		for(unsigned int i=0;i<clusters->size();i++){
+			(*clusters)[i]->Cluster_Insert(new_neigh[i]);
 		}
 	}
 	return objective_value;

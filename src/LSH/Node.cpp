@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
-#include "../../include/Object_Info.h"
-#include "../../include/Node.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/LSH/Node.h"
 #include "../../include/Types.h"
 
 using namespace std;

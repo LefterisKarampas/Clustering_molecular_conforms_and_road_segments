@@ -1,40 +1,50 @@
 #include <iostream>
-#include <stdio.h>
-#include <cstdlib>
+#include <cstdio>
 #include <ctime>
+#include <sys/time.h>
+#include <cstdlib>
 #include <fstream>
 #include <vector>
 #include "../../include/Types.h"
-#include "../../include/Object_Info.h"
-#include "../../include/Distance_Metric.h"
-#include "../../include/Initialization.h"
-#include "../../include/Assignment.h"
-#include "../../include/Update.h"
-#include "../../include/Cluster.h"
-#include "../../include/Silhouette.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/Distance/Distance_Metric.h"
+#include "../../include/Clustering/Initialization.h"
+#include "../../include/Clustering/Assignment.h"
+#include "../../include/Clustering/Update.h"
+#include "../../include/Clustering/Cluster.h"
+#include "../../include/Clustering/Silhouette.h"
+
 
 using namespace std;
 
-void print_clustering(Clusters clusters,ofstream &output,double silhouette,int k){
-	output << k << endl;
-	output << silhouette << endl;
-	for(int i=0;i<k;i++){
+float timedifference_msec(struct timeval t0, struct timeval t1)
+{
+    return (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
+}
+
+
+void print_clustering(Clusters clusters,ofstream &output,double silhouette,int k,int time_flag,float secs){
+	output <<"k: " << k << endl;
+	output << "s: "<< silhouette << endl;
+	if(time_flag)
+		output << "clustering_time: " << secs << endl;
+	for(int i=0;i<clusters.size();i++){
 		Neighbors neigh = clusters[i]->Cluster_Get_Neighbors();
 		if(neigh.size() == 0){
 			output << "Failed! " << clusters[i]->Cluster_Get_Center();
 		}
-		//output << "Cluster with center: "<< clusters[i]->Cluster_Get_Center() << endl;
 		std::sort(neigh.begin(),neigh.end());
 		for(unsigned int j=0;j<neigh.size();j++){
 			output << neigh[j] << "\t";
 		}
 		output << endl;
 	}
+	output << "-----------------------" << endl;
 	output << endl;
 }
 
 
-void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int),ofstream &output,int silhouette_flag){
+void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int),ofstream &output,int silhouette_flag,int time_flag){
 	int prev_k;
 	int best_k;
 	double best_value;
@@ -43,12 +53,15 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 	std::vector<int> out;
 	int sil_loop=0;
 	std::vector<int> cluster_centers;
-	
+	struct timeval start, stop;
+	float secs = 0;
+
+	gettimeofday(&start, NULL);
 	K_Means_Plusplus(&cluster_centers, k, n, distance);
 	//Random_Initialization(&cluster_centers,k,n);
 	do{
 		Clusters clusters;
-		int rem =0;
+		int rem=0;
 		for(unsigned int p=0;p<out.size();p++){
 			cluster_centers.erase(cluster_centers.begin()+(out[p]-rem));
 			rem++;
@@ -64,15 +77,19 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 		
 		objective_value = Lloyd_Assignment(&clusters,n,distance);
 		do{
+		
 			PAM_Improved(&clusters,distance);
 			prev = objective_value;
 			loop++;
 			objective_value = Lloyd_Assignment(&clusters,n,distance);
+	
 		}while(loop < 20 && (abs(prev - objective_value) > 0.005));
 
 		prev_k = k;
 		out.clear();
+		
 		k = Silhouette(clusters,distance,&out,&silhouette_value);
+		
 		for(int i=0;i<n;i++){
 			object_info[i]->Clear_Flag();
 		}
@@ -85,8 +102,10 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
  			best_k = prev_k;
  		}
  		sil_loop++;
+ 		gettimeofday(&stop, NULL);
+		secs = timedifference_msec(start,stop);
+		print_clustering(clusters,output,silhouette_value,prev_k,time_flag,secs);
 
-		print_clustering(clusters,output,silhouette_value,prev_k);
 		for(int i=0;i<prev_k;i++){
 			delete clusters[i];
 		}
@@ -96,6 +115,7 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 		if(prev_k > 200){
 			prev_k = k/3;
 		}
+		gettimeofday(&start, NULL);
 	}while(k>1 && silhouette_flag);
 	if(silhouette_flag)
 		cout << "Best silhouette_value " << best_value << " with " << best_k << " clusters" << endl;

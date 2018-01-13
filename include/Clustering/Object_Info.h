@@ -2,8 +2,8 @@
 #define _CURVE_INFO_H_
 
 
-#include "Types.h"
-#include "../include/Eigen/Dense"
+#include "../Types.h"
+#include "../Eigen/Dense"
 
 using namespace Eigen;
 

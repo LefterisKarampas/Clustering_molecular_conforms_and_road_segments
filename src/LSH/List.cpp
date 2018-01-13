@@ -1,8 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
-#include "../../include/List.h"
-#include "../../include/NodeWay.h"
-#include "../../include/Ways.h"
+#include <algorithm>
+#include "../../include/LSH/List.h"
+#include "../../include/RoadSegment_Clustering/NodeWay.h"
+#include "../../include/RoadSegment_Clustering/Ways.h"
 
 using namespace std;
 
@@ -75,4 +77,29 @@ int List::List_Insert(int index,Point *point){		//Insert a new node to list
 
 void List::Set_NULL(){
 	this->head = NULL;
+}
+
+
+void List::Print(std::ofstream &output){
+	Node *temp = this->head;
+	vector<int> index;
+	while(temp != NULL){
+		index.push_back(temp->GetIndex());
+		temp = temp->GetNext();
+	}
+	std::sort(index.begin(),index.end());
+	for(unsigned int i =0;i<index.size();i++){
+		output << index[i] << "\t";
+	}
+	output << endl;
+}
+
+vector<int> * List::Get_Values(){
+	Node *temp = this->head;
+	vector<int> * index = new vector<int>;
+	while(temp != NULL){
+		index->push_back(temp->GetIndex());
+		temp = temp->GetNext();
+	}
+	return index;
 }

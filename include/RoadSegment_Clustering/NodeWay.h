@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Ways.h"
-#include "Node.h"
+#include "../LSH/Node.h"
 
 using namespace std;
 

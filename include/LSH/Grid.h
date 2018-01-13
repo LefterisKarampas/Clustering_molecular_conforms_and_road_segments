@@ -2,7 +2,7 @@
 #define _GRID_H_
 
 #include <vector>
-#include "../include/Types.h"
+#include "../Types.h"
 
 
 using namespace std;
@@ -13,7 +13,7 @@ class Grid{
 	double delta;
 	//double Generator(double,double);
 public:
-	Grid(int,int);
+	Grid(int);
 	~Grid();
 	Point * Create_Point(const Object &);
 };

@@ -2,12 +2,11 @@
 #define _TYPES_H_
 
 #include <iostream>
-#include "Cluster.h"
 #include <vector>
 
 typedef std::vector<double> Point;
 typedef std::vector< Point > Object;
-typedef std::vector<Cluster *> Clusters; 
+
 
 
 #endif

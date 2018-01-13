@@ -7,8 +7,8 @@
 #include <fstream>
 #include <vector>
 #include "../../include/Types.h"
-#include "../../include/HashTable.h"
-#include "../../include/Ways.h"
+#include "../../include/LSH/HashTable.h"
+#include "../../include/RoadSegment_Clustering/Ways.h"
 
 #define BUCKETS 200
 

@@ -1,8 +1,8 @@
-#include "../../include/Update.h"
-#include "../../include/Object_Info.h"
-#include "../../include/Cluster.h"
-#include "../../include/Distance_Metric.h"
-#include "../../include/Mean_Frechet.h"
+#include "../../include/Clustering/Update.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/Clustering/Cluster.h"
+#include "../../include/Distance/Distance_Metric.h"
+#include "../../include/Clustering/Mean_Frechet.h"
 #include "../../include/Types.h"
 #include <iostream>
 #include <vector>
@@ -45,15 +45,12 @@ void PAM_Improved(Clusters *clusters,double (*distance)(int,int)){
 
 
 
-Object_Info * Create_MeanFrechet(Neighbors neigh){
-	Object_Info *new_center;
+Object * Create_MeanFrechet(Neighbors & neigh){
 	int loop = 0;
 	std::vector<Object *> *Mean  = new std::vector<Object *>;
 	int m = 0;
 	double dist;
 	do{
-		cout << loop << endl;
-		cout << Mean->size() << endl;
 		if(loop == 0){
 			unsigned int size = neigh.size();
 			for(unsigned int i=0;i<size;i+=2){
@@ -62,19 +59,6 @@ Object_Info * Create_MeanFrechet(Neighbors neigh){
 				}
 				else{
 					Mean->push_back(MeanFrechet(object_info[neigh[i]]->Get_Object_P(),object_info[neigh[i+1]]->Get_Object_P(),&dist));
-					int index_b;
-					int index_l;
-					if(neigh[i] > neigh[i+1]){
-						index_b = neigh[i];
-						index_l = neigh[i+1];
-					}
-					else{
-						index_b = neigh[i+1];
-						index_l = neigh[i];
-					}
-					if(Distance_Table[index_b][index_l] == -1){
-						Distance_Table[index_b][index_l] = dist;
-					}
 				}
 			}
 			if(size == 0){
@@ -87,9 +71,6 @@ Object_Info * Create_MeanFrechet(Neighbors neigh){
 			int n = 0;
 			std::vector<Object *> *temp  = new std::vector<Object *>;
 			for(unsigned int i=0;i<size;i+=2){
-				cout << "i: " << i << endl;
-				cout << (*Mean)[i]->size() << endl;
-				cout << (*(*Mean)[i])[0].size() << endl;
 				if(i == size-1){
 					temp->push_back(MeanFrechet((*Mean)[i],NULL,&dist));
 					delete (*Mean)[i];
@@ -106,16 +87,16 @@ Object_Info * Create_MeanFrechet(Neighbors neigh){
 		}
 		loop++;
 	}while(Mean->size() != 1);
-	new_center = new Object_Info((*Mean)[0]);
+	Object *object = (*Mean)[0];
 	delete Mean;
-	return new_center;
+	return object;
 }
 
 
 double Mean_Discrete_Frechet(Clusters *clusters,int n,double (*distance)(int,int)){
 	for(unsigned int i=0;i<clusters->size();i++){
 		Neighbors neigh = (*clusters)[i]->Cluster_Get_Neighbors();
-		Object_Info * object = Create_MeanFrechet(neigh);
+		Object * object = Create_MeanFrechet(neigh);
 		if(object != NULL){
 			if(object_info[n+i] != NULL){
 				delete object_info[n+i];
@@ -123,7 +104,7 @@ double Mean_Discrete_Frechet(Clusters *clusters,int n,double (*distance)(int,int
 					Distance_Table[n+i][j] = -1;
 				}
 			}
-			object_info[n+i] = object;
+			object_info[n+i] = new Object_Info(object);
 			(*clusters)[i]->Cluster_Update(n+i,0);
 		}
 	}

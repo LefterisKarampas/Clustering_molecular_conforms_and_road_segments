@@ -2,8 +2,8 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
-#include "../../include/Object_Info.h"
-#include "../../include/Road_Segmentation_Functions.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/RoadSegment_Clustering/Road_Segmentation_Functions.h"
 #include <fstream>
 #include <vector>
 
@@ -11,11 +11,11 @@ using namespace std;
 
 
 void Usage(char * exec){
-	fprintf(stderr,"Usage: %s -i <input_file> -o <output_file> -s <segmentation_file> -k <clusters> -r <radius> -l <length> -dim <dimension> -d <metric> \n",exec);
+	fprintf(stderr,"Usage: %s -i <input_file> -o <output_file> -s <segmentation_file> -k <clusters> -r <radius> -l <length> -dim <dimension> -d <metric> -lsh -t\n",exec);
 }
 
 int read_args(int argc,char **argv,char **input_file,char ** output_file,char **segmentation,int *k,
-	char **metric,float *max_r,float *length,int *dim,int *lsh){
+	char **metric,float *max_r,float *length,int *dim,int *lsh,int *time_flag){
 	if(argc < 3){
 		Usage(argv[0]);
 		exit(1);
@@ -60,17 +60,33 @@ int read_args(int argc,char **argv,char **input_file,char ** output_file,char **
 			*lsh = 1;
 			i--;
 		}
+		else if(!strcmp(argv[i],"-t")){
+			*time_flag = 1;
+			i--;
+		}
 		else if(!strcmp(argv[i],"-h")){
 			Usage(argv[0]);
 			exit(0);
 		}
 		i+=2;
 	}
+	if(*input_file == NULL){
+		if(((*segmentation) == NULL) || ((*output_file) == NULL)){
+			cerr << "Give at least input_file or segmentation_file and output_file" << endl;
+			Usage(argv[0]);
+			exit(1);
+		}
+	}
+	if((*metric) == NULL){
+		cerr << "Give metric distance" << endl;
+		Usage(argv[0]);
+		exit(1);
+	}
 	return 0;
 }
 
 
-int read_dataset(char *input_file,Object_Info *** object_info,int dim,int lsh_flag){
+int read_dataset(char *input_file,Object_Info *** object_info,int dim){
 	string line;
 	ifstream myfile(input_file);
 	if (!myfile.is_open())
@@ -108,10 +124,6 @@ int read_dataset(char *input_file,Object_Info *** object_info,int dim,int lsh_fl
 				p.push_back(x);
 				if(m % dim == 0){
 					object->push_back(p);
-					for(int i=0;i<dim;i++){
-						cout << p[i] <<" ";
-					}
-					cout << endl;
 					m = 1;
 					p.clear();
 				}
@@ -122,17 +134,11 @@ int read_dataset(char *input_file,Object_Info *** object_info,int dim,int lsh_fl
 			k++;
 		}
 		(*object_info)[num] = new Object_Info(object);
-		if(lsh_flag){
-			;
-		}
 		num++;
 	}
 	if(num != segments){
 		cerr << num << " " << segments<< " FAILED!" << endl;
 		exit(1);
-	}
-	for(int i=segments;i<segments;i++){
-		(*object_info)[i] = NULL;
 	}
 	myfile.close();
 	return segments;

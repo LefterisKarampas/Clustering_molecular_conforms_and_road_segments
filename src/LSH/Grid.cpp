@@ -2,13 +2,13 @@
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
-#include "../../include/Grid.h"
+#include "../../include/LSH/Grid.h"
 #include "../../include/generator.h"
 #include "../../include/Types.h"
 
 using namespace std;
 
-Grid::Grid(int d,int m){
+Grid::Grid(int d){
 	for(int i=0;i<d;i++){
 		double x;
 		do{

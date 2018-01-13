@@ -1,21 +1,21 @@
 #include <vector>
 #include <iostream>
-#include "../../include/LSH.h"
-#include "../../include/HashFunctions.h"
-#include "../../include/LSH_HashTable.h"
+#include <fstream>
+#include "../../include/LSH/LSH.h"
+#include "../../include/LSH/HashFunctions.h"
+#include "../../include/LSH/LSH_HashTable.h"
 #include "../../include/Types.h"
-#include "../../include/Object_Info.h"
-#include "../../include/Grid.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/LSH/Grid.h"
 
-extern Object_Info** object_info;
+using namespace std;
 
 
-LSH::LSH(int k,int dim,int k_vect,int num_points,int buckets,int id,int(*hash_function)(const Point &,const std::vector<int> &,int,int,std::vector<double> **,double *)){
+LSH::LSH(int k,int dim,int k_vect,int buckets,int(*hash_function)(const Point &,const std::vector<int> &,int,int,std::vector<double> **,double *)){
 	this->k = k;
-	this->id = id;
 	this->G = new Grid*[k];									//Create a array of k Grids
-	for(int i =0;i<k;i++){
-		this->G[i] = new Grid(dim,num_points);					//Initialize each Grid
+	for(int i =0;i<this->k;i++){
+		this->G[i] = new Grid(dim);					//Initialize each Grid
 	}
 	this->HT = new LSH_HashTable(k_vect,buckets,hash_function);		//Create the LSH HashTable 
 }
@@ -24,7 +24,7 @@ LSH::LSH(int k,int dim,int k_vect,int num_points,int buckets,int id,int(*hash_fu
 
 
 LSH::~LSH(){
-	for(int i =0;i<this->k;i++){
+	for(int i=0;i<this->k;i++){
 		delete this->G[i];											//Delete each Grid
 	}
 	delete[] this->G;												//Delete the array of Grids
@@ -58,7 +58,15 @@ Point * LSH::Create_Point(const Object & v){						//Get a curve and return the g
 
 
 
-int LSH::LSH_Insert(int index){					//Insert a curve in the LSH HashTable
-	Point* Grid_Concat = Create_Point(object_info[index]->Get_Curve());						//First get the grid_curve
+int LSH::LSH_Insert(int index,const Object &object){					//Insert a curve in the LSH HashTable
+	Point* Grid_Concat = Create_Point(object);						//First get the grid_curve
 	return this->HT->Hash_Insert(index,Grid_Concat);							//THen insert the new object to HT
+}
+
+void LSH::Print_Buckets(ofstream & output){
+	this->HT->Print_Buckets(output);
+}
+
+vector<vector<int> *> LSH::Get_Clusters(){
+	return this->HT->Get_Clusters();
 }

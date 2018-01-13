@@ -1,7 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cstdlib>
-#include "../../include/LSH_HashTableTable.h"
+#include "../../include/LSH/LSH_HashTable.h"
 #include "../../include/generator.h"
 
 using namespace std;
@@ -13,11 +14,11 @@ using namespace std;
 #define W 4
 
 //Create the HashTable for LSH
-LSH_HashTableTable::LSH_HashTableTable(const int k_vect,const int n,
+LSH_HashTable::LSH_HashTable(const int k_vect,const int n,
 	int(*hash_function)(const Point &,const std::vector<int> &,int,int,std::vector<double> **,double *)):HashTable(n),k_vec_(k_vect),Hash_Function(hash_function){
-	this->t = (double *) malloc(sizeof(double)*k_vec_);		//othewise classic hash function
-	this->v = new std::vector<double> * [k_vec_];			//Initialize the v and t parameters for function
-	for(int i=0;i<k_vec_;i++){
+	this->t = (double *) malloc(sizeof(double)*k_vect);		//othewise classic hash function
+	this->v = new std::vector<double> * [k_vect];			//Initialize the v and t parameters for function
+	for(int i=0;i<k_vect;i++){
 		this->v[i] = new std::vector<double>();				//We have to create k_vec vectors v,t
 		do{
 			this->t[i] = Uniform_Generator(0,1);
@@ -27,7 +28,7 @@ LSH_HashTableTable::LSH_HashTableTable(const int k_vect,const int n,
 	
 }
 
-LSH_HashTableTable::~LSH_HashTableTable(){
+LSH_HashTable::~LSH_HashTable(){
 	free(this->t);
 	for(int i =0;i<this->k_vec_;i++){
 		delete this->v[i];
@@ -60,4 +61,21 @@ int LSH_HashTable::Hash_Insert(int index,Point *point){			//Insert a new object 
 		return -1;
 	}
 	return this->T[bucket]->Bucket_Insert(index,point);		//Insert the object to the bucket
+}
+
+void LSH_HashTable::Print_Buckets(ofstream & output){
+	for(int i=0;i<this->buckets;i++){
+		this->T[i]->Print_List(output);
+	}
+}
+
+vector<vector<int> *> LSH_HashTable::Get_Clusters(){
+	vector<vector<int> *> neigh;
+	for(int i=0;i<this->buckets;i++){
+		vector<int> *temp = this->T[i]->Get_Values();
+		if(temp != NULL){
+			neigh.push_back(temp);
+		}
+	}
+	return neigh;
 }

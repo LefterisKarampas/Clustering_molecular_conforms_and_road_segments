@@ -1,8 +1,8 @@
 #ifndef _TRANSFORM_H_
 #define _TRANSFORM_H_
 
-#include "Eigen/Dense"
-#include "Types.h"
+#include "../Eigen/Dense"
+#include "../Types.h"
 
 using namespace Eigen;
 

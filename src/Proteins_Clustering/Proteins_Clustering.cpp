@@ -5,16 +5,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../../include/protein_main_functions.h"
+#include "../../include/Proteins_Clustering/protein_main_functions.h"
 #include "../../include/Types.h"
-#include "../../include/Object_Info.h"
-#include "../../include/Distance_Metric.h"
-#include "../../include/Initialization.h"
-#include "../../include/Assignment.h"
-#include "../../include/Update.h"
-#include "../../include/Cluster.h"
-#include "../../include/Silhouette.h"
-#include "../../include/Clustering.h"
+#include "../../include/Clustering/Object_Info.h"
+#include "../../include/Distance/Distance_Metric.h"
+#include "../../include/Clustering/Clustering.h"
 
 
 Object_Info ** object_info;
@@ -29,17 +24,19 @@ int main(int argc,char **argv){
 	char * metric = NULL;
 	int k = -1;
 	int first_k;
+	int dim = 3;
+	int time_flag = 0;
 	ofstream output;
-	if(get_args(argc,argv,&input_file,&metric,&k)){
+	if(get_args(argc,argv,&input_file,&metric,&k,&dim,&time_flag)){
 		return 1;
 	}
 	int silhouette_flag = 0;
 	if(k == -1){
 		silhouette_flag = 1;
 	}
-	read_dataset(input_file,&object_info,&n,&k);
+	read_dataset(input_file,&object_info,&n,&k,dim);
 	first_k = k;
-	Distance_Table = (double **)malloc(sizeof(double *)*(n+k));
+	Distance_Table = (double **)malloc(sizeof(double *)*n);
 	for(int i=0;i<n;i++){
 		Distance_Table[i] = (double *)malloc(sizeof(double)*(i+1));
 		for(int j=0;j<i+1;j++){
@@ -50,12 +47,6 @@ int main(int argc,char **argv){
 				Distance_Table[i][j] = -1;
 			}
 		
-		}
-	}
-	for(int i=n;i<n+k;i++){
-		Distance_Table[i] = (double *)malloc(sizeof(double)*n);
-		for(int j=0;j<n;j++){
-			Distance_Table[i][j] = -1;
 		}
 	}
 	srand(time(NULL));
@@ -70,10 +61,10 @@ int main(int argc,char **argv){
 		output.open("./results/crmsd.dat");
 	}
 
-	Clustering(k,n,object_info,distance,output,silhouette_flag);
+	Clustering(k,n,object_info,distance,output,silhouette_flag,time_flag);
 
 	//Free allocated space
-	for(int i=0;i<n+first_k;i++){
+	for(int i=0;i<n;i++){
 		if(object_info[i] != NULL){
 			delete object_info[i];
 		}

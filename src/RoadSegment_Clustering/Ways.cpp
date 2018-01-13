@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
-#include "../../include/Ways.h"
+#include "../../include/RoadSegment_Clustering/Ways.h"
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>

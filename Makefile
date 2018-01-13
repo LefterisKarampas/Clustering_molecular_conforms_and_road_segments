@@ -27,7 +27,8 @@ segments:
 	$(CL)/Object_Info.cpp $(RSC)/Ways.cpp $(RSC)/NodeWay.cpp $(RSC)/Road_Segmentation_Functions.cpp \
 	$(DI)/Distance_Metric.cpp $(CL)/Mean_Frechet.cpp $(DI)/Transform.cpp $(CL)/Initialization.cpp \
 	$(CL)/Cluster.cpp $(CL)/Update.cpp $(CL)/Assignment.cpp $(CL)/Silhouette.cpp \
-	$(CL)/Clustering.cpp $(LIBS)
+	$(CL)/Clustering.cpp $(CL)/LSH_Clustering.cpp $(LSH)/LSH_HashTable.cpp $(LSH)/LSH.cpp \
+	$(LSH)/Grid.cpp $(LIBS)
 
 clean:
 	rm -rf ./build/* ./results/*.dat

@@ -2,7 +2,10 @@
 #define _LSH_HASH_H_
 
 #include "HashTable.h"
-#include "Types.h"
+#include "../Types.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 class LSH_HashTable: public HashTable{
 	int (*Hash_Function)(const Point &,const std::vector<int> &,int,int,std::vector<double> **,double *);
@@ -15,6 +18,8 @@ public:
 	~LSH_HashTable();
 	int Hash(Point *);
 	int Hash_Insert(int,Point *);
+	void Print_Buckets(std::ofstream & output);
+	std::vector<std::vector<int> *> Get_Clusters();
 };
 
 #endif

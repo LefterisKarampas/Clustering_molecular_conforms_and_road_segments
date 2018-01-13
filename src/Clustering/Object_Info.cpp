@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "../../include/Eigen/Dense"
-#include "../../include/Object_Info.h"
+#include "../../include/Clustering/Object_Info.h"
 
 using namespace Eigen;
 
