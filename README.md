@@ -1,4 +1,4 @@
-# Clustering_molecular_conform and road segments
+# Clustering molecular conforms and road segments
 
 ## Metric Distance
 1. c-RMSD
@@ -16,8 +16,8 @@
 ## Assignment 
 1. Lloyd's Assignment
 
-##Silhouette
+## Silhouette
 
-##LSH_Clustering
+## LSH_Clustering
 
 
