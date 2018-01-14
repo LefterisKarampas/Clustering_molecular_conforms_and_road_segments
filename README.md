@@ -20,4 +20,8 @@
 
 ## LSH_Clustering
 
+## Datasets
+Link: https://drive.google.com/drive/folders/1eYBNyTo04Ekm6pYCNmzF2zlkuy7yIm47?usp=sharing
+
+
 
