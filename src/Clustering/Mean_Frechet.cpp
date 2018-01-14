@@ -127,17 +127,19 @@ Object * MeanFrechet(Object *v1,Object *v2,double *dist){
 	Object *obj;
 	if(x_size > y_size){
 		Q = Rotate(X->topRows(y_size),*Y);
+		//Create Frechet Matrix 
 		obj = MeanFrechetMatrix((X->topRows(y_size))*Q,*Y,dist);
 	}
 	else if(x_size < y_size){
 		Q = Rotate(*X,Y->topRows(x_size));
+		//Create Frechet Matrix 
 		obj = MeanFrechetMatrix((*X)*Q,Y->topRows(x_size),dist);
 	}
 	else{
 		Q = Rotate(*X,*Y);
+		//Create Frechet Matrix 
 		obj = MeanFrechetMatrix((*X)*Q,*Y,dist);
 	}
-	//Create Frechet Matrix 
 	
 	delete X;
 	delete Y;

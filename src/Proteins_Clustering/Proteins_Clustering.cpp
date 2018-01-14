@@ -27,6 +27,7 @@ int main(int argc,char **argv){
 	int dim = 3;
 	int time_flag = 0;
 	ofstream output;
+	//Read args
 	if(get_args(argc,argv,&input_file,&metric,&k,&dim,&time_flag)){
 		return 1;
 	}
@@ -34,10 +35,14 @@ int main(int argc,char **argv){
 	if(k == -1){
 		silhouette_flag = 1;
 	}
+	//Read dataset
 	read_dataset(input_file,&object_info,&n,&k,dim);
 	first_k = k;
+
+	//Create Distance Table
 	Distance_Table = (double **)malloc(sizeof(double *)*n);
 	for(int i=0;i<n;i++){
+		//Avoid duplicate distance with that way
 		Distance_Table[i] = (double *)malloc(sizeof(double)*(i+1));
 		for(int j=0;j<i+1;j++){
 			if(i == j){

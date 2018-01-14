@@ -19,17 +19,22 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 		cerr << "We don't have any curve\n" << endl;
 	}
 	double objective_value = 0;
-	//First assignment
 	int flag = 0;
 	int t;
+
+	//First assignment
 	if(object_info[0]->Get_Flag() == 0){
+		//For each object
 		for(int i=0;i<n;i++){
 			int min;
 			double min_dist;
 			int second_best;
 			double second_dist;
+			//For each cluster
 			for(unsigned int j=0;j<clusters->size();j++){
+				//Get cluster center
 				int center = (*clusters)[j]->Cluster_Get_Center();
+				//Compute the distance between object and cluster center
 				double dist;
 				if(center == i){
 					flag = 1;
@@ -39,6 +44,7 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 				else{
 					dist = Find_Distance(center,i,distance,Distance_Table);
 				}
+				//Hold the min distance and the second min
 				if(j==0){
 					min = j;
 					min_dist = dist;
@@ -54,6 +60,9 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 					second_dist = dist;
 				}
 			}
+			//In the case where object is center and has min_distance with another center
+			//Change min to current cluster and second best with the other cluster
+			//This only will happen after Rotate and have only 1 point
 			if(flag && min != t){
 				(*clusters)[t]->Cluster_Insert(i,min_dist);
 				objective_value += min_dist;
@@ -69,21 +78,28 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 			flag = 0;
 		}
 	}
+	//Already Initialization Clusters
 	else{
+		//Create new neighbors
 		Neighbors *new_neigh[clusters->size()];
 		for(unsigned int i=0;i<clusters->size();i++){
 			new_neigh[i] = new Neighbors();
 		}
+		//For each cluters
 		for(unsigned int i=0;i<clusters->size();i++){
-			int removed = 0;
+			//Get its neighbors
 			std::vector<int> neigh = (*clusters)[i]->Cluster_Get_Neighbors();
+			//For each object in cluster
 			for(unsigned int j=0;j<neigh.size();j++){
 				int min;
 				double min_dist;
 				int second_best;
 				double second_dist;
+				//For each cluster
 				for(unsigned int k=0;k<clusters->size();k++){
-					int center = (*clusters)[k]->Cluster_Get_Center();
+					//Get the cluster's center
+					int center = (*clusters)[k]->Cluster_Get_Center(); 
+					//Find the distance between object and center
 					double dist;
 					if(center == neigh[j]){
 						dist = 0;
@@ -93,6 +109,8 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 					else{
 						dist = Find_Distance(center,neigh[j],distance,Distance_Table);
 					}
+					//Hold the cluster with the min distance from object
+					//and the second_min
 					if(k==0){
 						min = k;
 						min_dist = dist;
@@ -108,6 +126,9 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 						second_dist = dist;
 					}
 				}
+				//In the case where object is center and has min_distance with another center
+				//Change min to current cluster and second best with the other cluster
+				//This only will happen after Rotate and have only 1 point
 				if(flag && (min != t)){
 					new_neigh[t]->push_back(neigh[j]);
 					objective_value += min_dist;
@@ -123,14 +144,17 @@ double Lloyd_Assignment(Clusters *clusters,int n,double (*distance)(int,int)){
 				flag = 0;
 			}
 		}
+		//For each cluster update neighbors
 		for(unsigned int i=0;i<clusters->size();i++){
 			(*clusters)[i]->Cluster_Insert(new_neigh[i]);
 		}
 	}
+	//Return objective_value
 	return objective_value;
 }
 
 
+//LSH_RangeSearch Assignment has not a good convergence, just let it for future work!
 
 /*double LSH_RangeSearch_Assignment(Clusters *clusters,int n,LSH_Curve ** LSH,int num_HT,double (*distance)(int,int)){
 	int flag = 0;

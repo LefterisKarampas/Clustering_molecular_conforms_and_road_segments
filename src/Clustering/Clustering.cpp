@@ -17,6 +17,7 @@
 
 using namespace std;
 
+//Time to msec
 float timedifference_msec(struct timeval t0, struct timeval t1)
 {
     return (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
@@ -57,15 +58,13 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 	float secs = 0;
 
 	gettimeofday(&start, NULL);
+	//Initialization cluster centrs
 	K_Means_Plusplus(&cluster_centers, k, n, distance);
 	//Random_Initialization(&cluster_centers,k,n);
 	do{
+
+		//Initialize clusters
 		Clusters clusters;
-		int rem=0;
-		for(unsigned int p=0;p<out.size();p++){
-			cluster_centers.erase(cluster_centers.begin()+(out[p]-rem));
-			rem++;
-		}
 		for(int i=0;i<k;i++){
 			int new_center = cluster_centers[i];
 			Cluster *temp = new Cluster(new_center);
@@ -74,10 +73,11 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 		
 		double objective_value,prev;
 		int loop = 0;
-		
+
+		//First Assignment
 		objective_value = Lloyd_Assignment(&clusters,n,distance);
 		do{
-		
+
 			PAM_Improved(&clusters,distance);
 			prev = objective_value;
 			loop++;
@@ -87,12 +87,15 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
 
 		prev_k = k;
 		out.clear();
-		
+		//Compute the silhouette value and get the number of next k clustering
 		k = Silhouette(clusters,distance,&out,&silhouette_value);
 		
+		//Clear for each object the flag
 		for(int i=0;i<n;i++){
 			object_info[i]->Clear_Flag();
 		}
+
+		//Hold the best silhouette value
 		if(sil_loop == 0){
 			best_value = silhouette_value;
 			best_k  = prev_k;
@@ -102,19 +105,30 @@ void Clustering(int k,int n,Object_Info **object_info,double (*distance)(int,int
  			best_k = prev_k;
  		}
  		sil_loop++;
+ 		//Stop time and print out the results
  		gettimeofday(&stop, NULL);
 		secs = timedifference_msec(start,stop);
 		print_clustering(clusters,output,silhouette_value,prev_k,time_flag,secs);
 
+		//Delete clusters
 		for(int i=0;i<prev_k;i++){
 			delete clusters[i];
 		}
+
 		if(prev_k == k){
 			k--;
 		}
-		if(prev_k > 200){
-			prev_k = k/3;
+		//If k is too big, cut it
+		if(k > 200){
+			k = k/3;
 		}
+		//Get out the cluster's center which has bad silhouette value
+		int rem=0;
+		for(unsigned int p=0;p<out.size();p++){
+			cluster_centers.erase(cluster_centers.begin()+(out[p]-rem));
+			rem++;
+		}
+
 		gettimeofday(&start, NULL);
 	}while(k>1 && silhouette_flag);
 	if(silhouette_flag)

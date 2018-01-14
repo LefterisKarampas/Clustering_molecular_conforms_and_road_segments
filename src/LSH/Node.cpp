@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include "../../include/Clustering/Object_Info.h"
 #include "../../include/LSH/Node.h"
 #include "../../include/Types.h"
 

@@ -52,8 +52,10 @@ int main(int argc,char **argv){
 		}
 	}
 	cout << "Input_File: " << input_file << endl;
+	//Read dataset and store them in Object Info Table
 	n = read_dataset(input_file,&object_info,dim);
 
+	//Create the Distance Table Structure
 	Distance_Table = (double **)malloc(sizeof(double *)*n);
 	for(int i=0;i<n;i++){
 		Distance_Table[i] = (double *)malloc(sizeof(double)*(i+1));
@@ -68,6 +70,7 @@ int main(int argc,char **argv){
 		}
 	}
 
+	//Clustering
 	if(!lsh_flag){
 		int silhouette_flag = 0;
 		if(k == -1){
@@ -91,6 +94,7 @@ int main(int argc,char **argv){
 		}
 		Clustering(k,n,object_info,distance,output,silhouette_flag,time_flag);
 	}
+	//LSH Clustering
 	else{
 		if(k == -1){
 			k = 2;

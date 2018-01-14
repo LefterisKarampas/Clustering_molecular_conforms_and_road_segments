@@ -47,11 +47,6 @@ const Neighbors  & Cluster::Cluster_Get_Neighbors(){
 }
 
 
-void Cluster::Cluster_Remove_Neigh(int index_neigh){
-	this->neighbors->erase(this->neighbors->begin() + index_neigh);
-}
-
-
 void Cluster::Cluster_Update(int new_center,double objective_value){
 	this->center = new_center;
 	this->local_objective_value = objective_value;

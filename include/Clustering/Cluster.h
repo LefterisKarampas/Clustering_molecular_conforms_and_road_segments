@@ -22,7 +22,6 @@ public:
 	void Cluster_Insert(int,double);
 	void Cluster_Insert(Neighbors *);
 	const Neighbors & Cluster_Get_Neighbors();
-	void Cluster_Remove_Neigh(int);
 	void Cluster_Update(int,double);
 	void Cluster_ClearNeigh();
 	int Get_num_neigh();

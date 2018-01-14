@@ -20,14 +20,18 @@ int Silhouette(Clusters clusters,double (*distance)(int,int),vector<int> *out,do
 	double all = 0;
 	int count = 0;
 	double overall = 0;
+	//For each cluster
 	for(unsigned int i=0;i<clusters.size();i++){
 		Neighbors neigh = clusters[i]->Cluster_Get_Neighbors();
 		silhouette.push_back(0);
+		//For each object in cluster
 		for(unsigned int j=0;j<neigh.size();j++){
 			double sum = 0;
+			//Find sum distance from this object to all other objects in cluster
 			for(unsigned int k=0;k<neigh.size();k++){
 				sum += Find_Distance(neigh[j],neigh[k],distance,Distance_Table);
 			}
+			//Find sum distance from this object to all other objects in the second best_cluster
 			Neighbors second_neigh  = clusters[object_info[neigh[j]]->Get_second_neigh()]->Cluster_Get_Neighbors();
 			double second_sum = 0;
 			for(unsigned int k=0;k<second_neigh.size();k++){
@@ -36,6 +40,7 @@ int Silhouette(Clusters clusters,double (*distance)(int,int),vector<int> *out,do
 			if(second_sum == 0 && sum == 0){
 				continue;
 			}
+			//Silhouette value
 			if(second_sum > sum){
 				all += (second_sum-sum)/(double)second_sum;
 				silhouette[i] += (second_sum-sum)/(double)second_sum;
@@ -47,7 +52,9 @@ int Silhouette(Clusters clusters,double (*distance)(int,int),vector<int> *out,do
 		}
 		if(neigh.size() > 0){
 			count += neigh.size();
+			//Silhouette value for each cluster
 			silhouette[i] = silhouette[i]/(double) neigh.size();
+			//Silhouete value for all objects
 			overall += silhouette[i];
 			if(silhouette[i] <= THRESHOLD){
 				num_clusters--;

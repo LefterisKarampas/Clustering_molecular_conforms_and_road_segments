@@ -17,11 +17,14 @@ int Random_Initialization(std::vector<int> *Cluster_Centers,int num_clusters,int
 	std::vector<int> centers;
 	int new_center;
 	int flag = 0;
+	//Get random centers for clusters
 	for(int i=0;i<num_clusters;i++){
 		flag = 0;
 		while(!flag){
+			//Get a center 
 			new_center = rand() % num_objects;
 			unsigned int j;
+			//Check if it alreary exists
 			for(j=0;j<centers.size();j++){
 				if(centers[j] == new_center){
 					break;
@@ -43,11 +46,13 @@ int K_Means_Plusplus(std::vector<int> *Cluster_Centers,int num_clusters,int num_
 	std::vector<int> centers;
 	std::vector<double> min_distance;
 	int new_center;
-	new_center = rand() % num_objects;
+	new_center = rand() % num_objects; //Get a random center
 	for(int i=0;i<num_clusters-1;i++){
 		std::vector<double> P;
+
 		(*Cluster_Centers).push_back(new_center);
 		centers.push_back(new_center);
+
 		double max_dist = -1; 
 		for(int j=0;j<num_objects;j++){
 			if(j == 0){
@@ -76,9 +81,12 @@ int K_Means_Plusplus(std::vector<int> *Cluster_Centers,int num_clusters,int num_
 				min_distance[j] = dist;
 			}
 		}
+
 		for(int j=0;j<num_objects-centers.size();j++){
 			P.push_back(P[j]+min_distance[j]/max_dist * min_distance[j]/max_dist);
 		}
+
+		//Find the center with binary search
 		int flag = 0;
 		float x;
 		int upper = P.size();

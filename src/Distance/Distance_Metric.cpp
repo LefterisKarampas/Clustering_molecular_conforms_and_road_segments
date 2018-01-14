@@ -263,6 +263,8 @@ double Find_Distance(int x,int y,double(*distance)(int,int),double ** Distance_T
 		return 0;
 	}
 
+	//index_b = the max index between x and y
+	//index_l = the min index between x and y
 	if(x > y){
 		index_b = x;
 		index_l = y;
@@ -271,9 +273,13 @@ double Find_Distance(int x,int y,double(*distance)(int,int),double ** Distance_T
 		index_b = y;
 		index_l = x;
 	}
+	//If there is the distance in Distance Table
+	//Return the value
 	if(Distance_Table[index_b][index_l] != -1){
 		dist = Distance_Table[index_b][index_l];
 	}
+	//If there is not the distance in Distance Table
+	//Compute it and store it
 	else{
 		dist = (*distance)(index_b,index_l);
 		Distance_Table[index_b][index_l] = dist;

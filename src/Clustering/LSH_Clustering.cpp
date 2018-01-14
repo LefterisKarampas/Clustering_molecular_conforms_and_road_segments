@@ -54,20 +54,25 @@ void LSH_Clustering(int n,int k,Object_Info **object_info,double (*distance)(int
 	std::vector<int> out;
 	do{
 		gettimeofday(&start, NULL);
+		//Create LSH Structure
 		HT = new LSH(k,dim,k_vec,n/4,&probabilistic);
+		//Insert each object to LSH
 		for(int i=0;i<n;i++){
 			HT->LSH_Insert(i,object_info[i]->Get_Object());
 		}
 
+		//Get the clusters from LSH(buckets)
 		vector<vector<int> *> neigh = HT->Get_Clusters();
 		Clusters clusters;
 		for(unsigned int i=0;i<neigh.size();i++){
 			Cluster *temp = new Cluster(neigh[i]);
 			clusters.push_back(temp);
 		}
+		//Compute the second best cluster for each object
 		Find_SecondBest(clusters,object_info);
+		//Compute the silhouette value
 		Silhouette(clusters,distance,&out,&silhouette);
-		//Silhouette
+		//Hold the best silhouette value
 		if(loop == 0){
 			best_silhouette = silhouette;
 			best_k = k;
@@ -77,10 +82,12 @@ void LSH_Clustering(int n,int k,Object_Info **object_info,double (*distance)(int
 			best_k = k;
 		}
 		out.clear();
+		//Stop time and print out the results
 		gettimeofday(&stop, NULL);
 		secs = timedifference_msec(start,stop);
 		print_clustering(clusters,output,silhouette,k,1,secs);
 		//delete HT
+		//Delete clusters
 		for(int i=0;i<clusters.size();i++){
 			delete clusters[i];
 		}
