@@ -1,4 +1,4 @@
-# Clustering_molecular_conform
+# Clustering_molecular_conform and road segments
 
 ## Metric Distance
 1. c-RMSD
@@ -11,8 +11,13 @@
 
 ## Update
 1. PAM_Improved
-2. Mean Frechet (only for objects with the same dimensions)
+2. Mean Frechet
 
 ## Assignment 
 1. Lloyd's Assignment
+
+##Silhouette
+
+##LSH_Clustering
+
 
